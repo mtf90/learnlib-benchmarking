@@ -11,6 +11,9 @@ import io.avaje.http.api.Post;
 import io.avaje.jex.http.Context;
 import jakarta.persistence.EntityManager;
 
+/**
+ * The endpoint for all experiment related requests.
+ */
 @Path("experiments")
 @Controller
 public class ExperimentEndpoint {
@@ -21,12 +24,18 @@ public class ExperimentEndpoint {
      * Default constructor. We depend on Vex's {@link Context} to simulate a request-scoped lifecycle which gives us a
      * fresh entity manager for each request.
      *
-     * @param ctx the context
+     * @param ctx
+     *         the context
      */
     public ExperimentEndpoint(Context ctx) {
         this.entityManager = ctx.attribute(EntityManager.class);
     }
 
+    /**
+     * Get a list of all known experiments.
+     *
+     * @return the list of experiments
+     */
     @Get
     public List<DBExperiment> getAllExperiments() {
         var q = entityManager.getCriteriaBuilder().createQuery(DBExperiment.class);

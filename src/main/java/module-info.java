@@ -10,6 +10,7 @@ open module de.learnlib.benchmarking {
     requires io.avaje.http.api;
     requires io.avaje.inject;
     requires io.avaje.jex;
+    requires io.avaje.jex.staticcontent;
     requires io.avaje.jsonb;
     requires io.avaje.jsonb.plugin;
 
@@ -20,6 +21,7 @@ open module de.learnlib.benchmarking {
     requires org.objectweb.asm;
 
     requires org.hsqldb;
+    requires io.swagger.v3.oas.annotations;
 
     uses jakarta.persistence.spi.PersistenceProvider;
 
