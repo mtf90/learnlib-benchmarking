@@ -1,29 +1,20 @@
 package de.learnlib.benchmarking.entity;
 
-import io.avaje.jsonb.Json;
 import jakarta.persistence.Entity;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
-@Json
+@Getter
+@Setter
 public class DBStatistics extends DBIdentified {
 
-    private int numberOfQueries;
+    private int numberOfLearnerQueries;
 
-    private int numberOfSymbols;
+    private int numberOfLearnerSymbols;
 
-    public int getNumberOfQueries() {
-        return numberOfQueries;
-    }
+    private int numberOfTesterQueries;
 
-    public void setNumberOfQueries(int numberOfQueries) {
-        this.numberOfQueries = numberOfQueries;
-    }
+    private int numberOfTesterSymbols;
 
-    public int getNumberOfSymbols() {
-        return numberOfSymbols;
-    }
-
-    public void setNumberOfSymbols(int numberOfSymbols) {
-        this.numberOfSymbols = numberOfSymbols;
-    }
 }

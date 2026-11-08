@@ -1,0 +1,20 @@
+digraph {
+
+  __start0 [label="", shape="none"];
+  __start0 -> l0;
+
+  l0 [shape="doublecircle", label="l0"];
+  l1 [shape="circle", label="l1"];
+  l2 [shape="circle", label="l2"];
+  l3 [shape="circle", label="l3"];
+
+  l0 -> l1 [label="a"];
+  l0 -> l2 [label="b"];
+  l1 -> l0 [label="a"];
+  l1 -> l3 [label="b"];
+  l2 -> l0 [label="b"];
+  l2 -> l3 [label="a"];
+  l3 -> l1 [label="b"];
+  l3 -> l2 [label="a"];
+
+}

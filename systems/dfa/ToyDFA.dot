@@ -1,0 +1,14 @@
+digraph {
+
+  __start0 [label="", shape="none"];
+  __start0 -> l0;
+
+  l0 [shape="doublecircle", label="l0"];
+  l1 [shape="circle", label="l1"];
+
+  l0 -> l0 [label="1"];
+  l0 -> l1 [label="0"];
+  l1 -> l0 [label="0"];
+  l1 -> l1 [label="1"];
+
+}

@@ -1,8 +1,14 @@
 package de.learnlib.benchmarking.endpoint;
 
+import java.io.IOException;
+import java.time.ZonedDateTime;
 import java.util.List;
 
+import de.learnlib.benchmarking.dto.ExperimentDTO;
+import de.learnlib.benchmarking.dto.NewExperimentInputDTO;
+import de.learnlib.benchmarking.dto.NewExperimentOutputDTO;
 import de.learnlib.benchmarking.entity.DBExperiment;
+import de.learnlib.benchmarking.entity.DBExperiment_;
 import de.learnlib.benchmarking.entity.DBStatistics;
 import io.avaje.http.api.Controller;
 import io.avaje.http.api.Get;
@@ -10,6 +16,7 @@ import io.avaje.http.api.Path;
 import io.avaje.http.api.Post;
 import io.avaje.jex.http.Context;
 import jakarta.persistence.EntityManager;
+import net.automatalib.exception.FormatException;
 
 /**
  * The endpoint for all experiment related requests.
@@ -37,24 +44,37 @@ public class ExperimentEndpoint {
      * @return the list of experiments
      */
     @Get
-    public List<DBExperiment> getAllExperiments() {
-        var q = entityManager.getCriteriaBuilder().createQuery(DBExperiment.class);
-        var query = entityManager.createQuery(q.select(q.from(DBExperiment.class)));
+    public List<ExperimentDTO> getAllExperiments() {
+        var builder = entityManager.getCriteriaBuilder();
+        var q = builder.createQuery(DBExperiment.class);
+        var from = q.from(DBExperiment.class);
+        var query = entityManager.createQuery(q.select(from).orderBy(builder.asc(from.get(DBExperiment_.timestamp))));
 
-        return query.getResultList();
+        return query.getResultStream().map(ExperimentDTO::new).toList();
     }
 
     @Post
-    public long createNew() {
-        var experiment = new DBExperiment();
-        var stats = new DBStatistics();
+    public NewExperimentOutputDTO createNew(NewExperimentInputDTO data) throws IOException, FormatException {
 
+        final var type = data.type();
+        final var model = data.model();
+
+        final var loadedModel = type.loadModel(model);
+        final var alphabetSize = loadedModel.alphabet.size();
+
+        final var experiment = new DBExperiment();
+        final var stats = new DBStatistics();
+
+        experiment.setType(type);
+        experiment.setModel(model);
+        experiment.setTimestamp(ZonedDateTime.now());
+        experiment.setAlphabetSize(alphabetSize);
         experiment.setStatistics(stats);
 
         entityManager.persist(stats);
         entityManager.persist(experiment);
 
-        return experiment.getId();
+        return new NewExperimentOutputDTO(experiment.getId(), alphabetSize);
     }
 
 }
