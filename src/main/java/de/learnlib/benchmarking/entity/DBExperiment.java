@@ -1,6 +1,7 @@
 package de.learnlib.benchmarking.entity;
 
 import java.time.ZonedDateTime;
+import java.util.List;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -21,7 +22,7 @@ public class DBExperiment extends DBIdentified {
 
     private ZonedDateTime timestamp;
 
-    private int alphabetSize;
+    private List<String> alphabet;
 
     @OneToOne
     private DBStatistics statistics;

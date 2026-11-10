@@ -2,29 +2,30 @@ package de.learnlib.benchmarking.entity;
 
 import java.io.IOException;
 
-import de.learnlib.benchmarking.util.ModelCacheDFA;
+import de.learnlib.benchmarking.util.cache.ModelCacheDFA;
+import de.learnlib.benchmarking.util.cache.ModelCacheMealy;
 import net.automatalib.exception.FormatException;
 import net.automatalib.serialization.InputModelData;
 
 public enum ModelType {
     DFA {
         @Override
-        public InputModelData<?, ?> loadModel(String path) throws IOException, FormatException {
+        public InputModelData<String, ?> loadModel(String path) throws IOException, FormatException {
             return ModelCacheDFA.readDFA(path);
         }
     },
     MEALY {
         @Override
-        public InputModelData<?, ?> loadModel(String path) {
-            throw new UnsupportedOperationException();
+        public InputModelData<String, ?> loadModel(String path) throws IOException, FormatException {
+            return ModelCacheMealy.readMealy(path);
         }
     },
     MOORE {
         @Override
-        public InputModelData<?, ?> loadModel(String path) {
+        public InputModelData<String, ?> loadModel(String path) {
             throw new UnsupportedOperationException();
         }
     };
 
-    public abstract InputModelData<?, ?> loadModel(String path) throws IOException, FormatException;
+    public abstract InputModelData<String, ?> loadModel(String path) throws IOException, FormatException;
 }

@@ -1,4 +1,4 @@
-package de.learnlib.benchmarking.util;
+package de.learnlib.benchmarking.util.cache;
 
 import java.util.LinkedHashMap;
 import java.util.Map;

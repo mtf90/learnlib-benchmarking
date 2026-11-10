@@ -2,6 +2,7 @@ package de.learnlib.benchmarking.endpoint;
 
 import java.io.IOException;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import de.learnlib.benchmarking.dto.ExperimentDTO;
@@ -60,7 +61,7 @@ public class ExperimentEndpoint {
         final var model = data.model();
 
         final var loadedModel = type.loadModel(model);
-        final var alphabetSize = loadedModel.alphabet.size();
+        final var alphabet = new ArrayList<>(loadedModel.alphabet);
 
         final var experiment = new DBExperiment();
         final var stats = new DBStatistics();
@@ -68,13 +69,13 @@ public class ExperimentEndpoint {
         experiment.setType(type);
         experiment.setModel(model);
         experiment.setTimestamp(ZonedDateTime.now());
-        experiment.setAlphabetSize(alphabetSize);
+        experiment.setAlphabet(alphabet);
         experiment.setStatistics(stats);
 
         entityManager.persist(stats);
         entityManager.persist(experiment);
 
-        return new NewExperimentOutputDTO(experiment.getId(), alphabetSize);
+        return new NewExperimentOutputDTO(experiment.getId(), alphabet);
     }
 
 }
