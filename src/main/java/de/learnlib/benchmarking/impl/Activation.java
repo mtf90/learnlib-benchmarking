@@ -1,4 +1,4 @@
-package de.learnlib.benchmarking.endpoint;
+package de.learnlib.benchmarking.impl;
 
 import de.learnlib.benchmarking.BenchmarkingModule;
 import io.avaje.http.api.Controller;

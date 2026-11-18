@@ -19,10 +19,11 @@
             <property name="jakarta.persistence.jdbc.user" value="sa"/>
             <property name="jakarta.persistence.jdbc.password" value=""/>
 
-            <!-- Schema-Generierung -->
             <property name="eclipselink.ddl-generation" value="create-or-extend-tables"/>
+            <property name="eclipselink.ddl-generation.output-mode" value="database"/>
+            <property name="eclipselink.session.customizer"
+                      value="de.learnlib.benchmarking.util.ExistingConstraintSkipper"/>
 
-            <!-- EclipseLink Logging (hilft bei der Fehlersuche) -->
             <!--<property name="eclipselink.logging.level" value="FINEST"/>-->
             <property name="eclipselink.logging.level" value="WARNING"/>
         </properties>

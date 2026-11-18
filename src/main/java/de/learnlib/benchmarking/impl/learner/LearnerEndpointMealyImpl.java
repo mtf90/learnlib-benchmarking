@@ -1,17 +1,16 @@
-package de.learnlib.benchmarking.endpoint.learner;
+package de.learnlib.benchmarking.impl.learner;
 
 import java.io.IOException;
 import java.util.List;
 
-import de.learnlib.benchmarking.dto.QueryDTO;
+import de.learnlib.benchmarking.api.learner.LearnerEndpointMealy;
+import de.learnlib.benchmarking.dto.HypothesisDTO;
+import de.learnlib.benchmarking.dto.TransducerResponseDTO;
 import de.learnlib.benchmarking.entity.DBExperiment;
 import de.learnlib.benchmarking.entity.ModelType;
 import de.learnlib.benchmarking.util.cache.ModelCacheMealy;
-import io.avaje.http.api.Consumes;
+import de.learnlib.query.DefaultQuery;
 import io.avaje.http.api.Controller;
-import io.avaje.http.api.Path;
-import io.avaje.http.api.Post;
-import io.avaje.http.api.Produces;
 import io.avaje.jex.http.Context;
 import jakarta.persistence.EntityManager;
 import net.automatalib.automaton.transducer.MealyMachine;
@@ -21,9 +20,9 @@ import net.automatalib.word.Word;
 import org.jspecify.annotations.Nullable;
 
 @Controller
-@Path("/learner/mealy")
-public class LearnerEndpointMealy
-        extends AbstractLearnerEndpoint<MealyMachine<?, String, ?, String>, Word<String>, QueryDTO> {
+public class LearnerEndpointMealyImpl
+        extends AbstractLearnerEndpoint<MealyMachine<?, String, ?, String>, Word<String>, List<String>, TransducerResponseDTO>
+        implements LearnerEndpointMealy {
 
     private final EntityManager entityManager;
 
@@ -34,7 +33,7 @@ public class LearnerEndpointMealy
      * @param ctx
      *         the context
      */
-    public LearnerEndpointMealy(Context ctx, ModelCacheMealy modelCache) {
+    public LearnerEndpointMealyImpl(Context ctx, ModelCacheMealy modelCache) {
         super(modelCache);
         this.entityManager = ctx.attribute(EntityManager.class);
     }
@@ -45,27 +44,30 @@ public class LearnerEndpointMealy
     }
 
     @Override
-    protected QueryDTO transformOutput(Word<String> out) {
-        return new QueryDTO(out.asList());
+    protected List<String> transformMQOutput(Word<String> out) {
+        return out.asList();
+    }
+
+    @Override
+    protected TransducerResponseDTO transformEQOutput(DefaultQuery<String, Word<String>> out) {
+        return new TransducerResponseDTO(out.getInput().asList(), out.getOutput().asList());
     }
 
     @Override
     protected InputModelData<String, ? extends MealyMachine<?, String, ?, String>> parseHypothesis(String hypothesis)
             throws IOException, FormatException {
-        return ModelCacheMealy.readMealy(hypothesis);
+        return super.modelCache.readFromDot(hypothesis);
     }
 
-    @Post("/queries/{id}")
-    @Produces(statusCode = 200)
-    public List<QueryDTO> answerQueries(long id, List<QueryDTO> queries) {
+    @Override
+    public List<List<String>> answerQueries(long id, List<List<String>> queries) {
         final var experiment = entityManager.find(DBExperiment.class, id);
         return super.answerQueries(experiment, queries);
     }
 
-    @Post("/counterexample/{id}")
-    @Consumes("text/vnd.graphviz")
-    @Produces(statusCode = 200)
-    public @Nullable QueryDTO findCounterExample(long id, String hypothesis) throws IOException, FormatException {
+    @Override
+    public @Nullable TransducerResponseDTO findCounterExample(long id, HypothesisDTO hypothesis)
+            throws IOException, FormatException {
         final var experiment = entityManager.find(DBExperiment.class, id);
         return super.findCounterExample(experiment, hypothesis);
     }

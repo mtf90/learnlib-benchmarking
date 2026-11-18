@@ -1,6 +1,7 @@
 package de.learnlib.benchmarking.util.cache;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
@@ -10,15 +11,15 @@ import java.util.stream.Stream;
 import de.learnlib.benchmarking.entity.DBExperiment;
 import de.learnlib.oracle.EquivalenceOracle;
 import de.learnlib.oracle.MembershipOracle;
-import de.learnlib.oracle.equivalence.RandomWpMethodEQOracle;
-import net.automatalib.automaton.UniversalDeterministicAutomaton.RegularAutomaton;
+import net.automatalib.alphabet.Alphabet;
 import net.automatalib.automaton.concept.Output;
 import net.automatalib.exception.FormatException;
 import net.automatalib.serialization.InputModelData;
+import net.automatalib.serialization.InputModelSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class AbstractModelCache<M extends RegularAutomaton<?, I, ?, ?, ?> & Output<I, D>, I, D> {
+public abstract class AbstractModelCache<M extends Output<I, D>, I, D> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractModelCache.class);
     protected static final Path ROOT = Path.of(System.getProperty("de.learnlib.systems.root", "systems/"));
@@ -37,18 +38,16 @@ public abstract class AbstractModelCache<M extends RegularAutomaton<?, I, ?, ?, 
         }
     }
 
-    public EquivalenceOracle<M, I, D> getEQO(MembershipOracle<I, D> mqo) {
-        return new RandomWpMethodEQOracle<>(mqo, 0, 0);
-    }
+    public abstract EquivalenceOracle<M, I, D> getEQO(DBExperiment experiment, MembershipOracle<I, D> mqo);
 
-    public M readModel(DBExperiment experiment) {
+    public M readFromPath(DBExperiment experiment) {
 
         var model = experiment.getModel();
         InputModelData<I, ? extends M> entry = cache.get(model);
 
         if (entry == null) {
             try {
-                entry = readModel(model);
+                entry = readFromPath(model);
                 cache.put(model, new InputModelData<>(entry.model, entry.alphabet));
             } catch (IOException | FormatException e) {
                 throw new RuntimeException("Could not load model", e);
@@ -58,6 +57,13 @@ public abstract class AbstractModelCache<M extends RegularAutomaton<?, I, ?, ?, 
         return entry.model;
     }
 
-    public abstract InputModelData<I, ? extends M> readModel(String path) throws IOException, FormatException;
+    public abstract InputModelData<I, ? extends M> readFromDot(String dot) throws IOException, FormatException;
 
+    public abstract InputModelData<I, ? extends M> readFromPath(String path) throws IOException, FormatException;
+
+    protected static class DummySerializer<I, M> implements InputModelSerializer<I, M> {
+
+        @Override
+        public void writeModel(OutputStream outputStream, M m, Alphabet<I> alphabet){}
+    }
 }

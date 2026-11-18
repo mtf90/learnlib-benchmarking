@@ -16,16 +16,19 @@
         <maven.compiler.target>25</maven.compiler.target>
         <maven.compiler.release>25</maven.compiler.release>
 
-        <automatalib.version>13.0.0</automatalib.version>
-        <avaje-http.version>3.12.1</avaje-http.version>
+        <automatalib.version>14.0.0-SNAPSHOT</automatalib.version>
+        <avaje-applog.version>1.2</avaje-applog.version>
+        <avaje-http.version>3.13-RC2</avaje-http.version>
         <avaje-inject.version>12.7</avaje-inject.version>
         <avaje-jex.version>3.6</avaje-jex.version>
         <avaje-jsonb.version>3.16</avaje-jsonb.version>
+        <checkerframework.version>4.2.1</checkerframework.version>
         <eclipselink.version>5.0.2</eclipselink.version>
         <hsqldb.version>2.7.4</hsqldb.version>
-        <learnlib.version>19.0.0</learnlib.version>
+        <learnlib.version>20.0.0-SNAPSHOT</learnlib.version>
         <logback.version>1.5.35</logback.version>
         <lombok.version>1.18.48</lombok.version>
+        <metainf-services.version>1.11</metainf-services.version>
 
         <compiler-plugin.version>3.15.0</compiler-plugin.version>
         <jlink-plugin.version>3.3.0</jlink-plugin.version>
@@ -52,6 +55,11 @@
         </dependency>
         <dependency>
             <groupId>de.learnlib</groupId>
+            <artifactId>learnlib-cli</artifactId>
+            <version>${learnlib.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>de.learnlib</groupId>
             <artifactId>learnlib-equivalence-oracles</artifactId>
         </dependency>
         <dependency>
@@ -61,6 +69,10 @@
         <dependency>
             <groupId>net.automatalib</groupId>
             <artifactId>automata-serialization-dot</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>net.automatalib</groupId>
+            <artifactId>automata-util</artifactId>
         </dependency>
 
         <!-- all request stuff -->
@@ -85,6 +97,12 @@
             <groupId>io.avaje</groupId>
             <artifactId>avaje-jex-static-content</artifactId>
             <version>${avaje-jex.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.avaje</groupId>
+            <artifactId>avaje-applog-slf4j</artifactId>
+            <version>${avaje-applog.version}</version>
         </dependency>
 
         <dependency>
@@ -121,9 +139,45 @@
         </dependency>
 
         <dependency>
+            <groupId>org.checkerframework</groupId>
+            <artifactId>checker-qual</artifactId>
+            <version>${checkerframework.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.kohsuke.metainf-services</groupId>
+            <artifactId>metainf-services</artifactId>
+            <version>${metainf-services.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
             <version>${logback.version}</version>
+        </dependency>
+
+        <!-- test dependencies -->
+
+        <dependency>
+            <groupId>io.avaje</groupId>
+            <artifactId>avaje-http-client</artifactId>
+            <version>${avaje-http.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.avaje</groupId>
+            <artifactId>avaje-http-client-generator</artifactId>
+            <version>${avaje-http.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <version>7.12.0</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
@@ -152,6 +206,11 @@
                         </path>
                         <path>
                             <groupId>io.avaje</groupId>
+                            <artifactId>avaje-http-client-generator</artifactId>
+                            <version>${avaje-http.version}</version>
+                        </path>
+                        <path>
+                            <groupId>io.avaje</groupId>
                             <artifactId>avaje-jsonb-generator</artifactId>
                             <version>${avaje-jsonb.version}</version>
                         </path>
@@ -159,6 +218,11 @@
                             <groupId>org.projectlombok</groupId>
                             <artifactId>lombok</artifactId>
                             <version>${lombok.version}</version>
+                        </path>
+                        <path>
+                            <groupId>org.kohsuke.metainf-services</groupId>
+                            <artifactId>metainf-services</artifactId>
+                            <version>${metainf-services.version}</version>
                         </path>
                     </annotationProcessorPaths>
                 </configuration>
@@ -174,6 +238,30 @@
                         <phase>process-sources</phase>
                         <goals>
                             <goal>provides</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>3.5.5</version>
+                <configuration>
+                    <!-- required for ServiceLoader to work -->
+                    <useModulePath>false</useModulePath>
+                    <enableAssertions>true</enableAssertions>
+                    <systemPropertyVariables>
+                        <!-- run test DB in-memory -->
+                        <jakarta.persistence.jdbc.url>jdbc:hsqldb:mem:benchmarking;shutdown=true</jakarta.persistence.jdbc.url>
+                    </systemPropertyVariables>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>default</id>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
                         </goals>
                     </execution>
                 </executions>

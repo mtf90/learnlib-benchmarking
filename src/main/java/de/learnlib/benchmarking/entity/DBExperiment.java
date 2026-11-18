@@ -6,13 +6,17 @@ import java.util.List;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.Lob;
 import jakarta.persistence.OneToOne;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.Setter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@Setter
+@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class DBExperiment extends DBIdentified {
 
     @Enumerated(EnumType.STRING)
@@ -23,6 +27,9 @@ public class DBExperiment extends DBIdentified {
     private ZonedDateTime timestamp;
 
     private List<String> alphabet;
+
+    @Lob
+    private String eqoConfig;
 
     @OneToOne
     private DBStatistics statistics;

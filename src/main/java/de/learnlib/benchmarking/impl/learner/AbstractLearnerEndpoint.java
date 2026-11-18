@@ -1,24 +1,24 @@
-package de.learnlib.benchmarking.endpoint.learner;
+package de.learnlib.benchmarking.impl.learner;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
-import de.learnlib.benchmarking.dto.QueryDTO;
+import de.learnlib.benchmarking.dto.HypothesisDTO;
 import de.learnlib.benchmarking.entity.DBExperiment;
 import de.learnlib.benchmarking.entity.ModelType;
 import de.learnlib.benchmarking.util.SimCountOracle;
 import de.learnlib.benchmarking.util.cache.AbstractModelCache;
-import net.automatalib.automaton.UniversalDeterministicAutomaton.RegularAutomaton;
+import de.learnlib.query.DefaultQuery;
 import net.automatalib.automaton.concept.SuffixOutput;
 import net.automatalib.exception.FormatException;
 import net.automatalib.serialization.InputModelData;
 import org.jspecify.annotations.Nullable;
 
-public abstract class AbstractLearnerEndpoint<M extends RegularAutomaton<?, String, ?, ?, ?> & SuffixOutput<String, D>, D, OUT> {
+public abstract class AbstractLearnerEndpoint<M extends SuffixOutput<String, D>, D, MQOUT, EQOUT> {
 
-    private final AbstractModelCache<M, String, D> modelCache;
+    protected final AbstractModelCache<M, String, D> modelCache;
 
     public AbstractLearnerEndpoint(AbstractModelCache<M, String, D> modelCache) {
         this.modelCache = modelCache;
@@ -26,30 +26,32 @@ public abstract class AbstractLearnerEndpoint<M extends RegularAutomaton<?, Stri
 
     protected abstract ModelType getModelType();
 
-    protected abstract OUT transformOutput(D out);
+    protected abstract MQOUT transformMQOutput(D out);
+
+    protected abstract EQOUT transformEQOutput(DefaultQuery<String, D> out);
 
     protected abstract InputModelData<String, ? extends M> parseHypothesis(String hypothesis)
             throws IOException, FormatException;
 
-    protected List<OUT> answerQueries(DBExperiment experiment, List<QueryDTO> queries) {
+    protected List<MQOUT> answerQueries(DBExperiment experiment, List<List<String>> queries) {
 
         if (experiment.getType() != getModelType()) {
             throw new IllegalArgumentException("Type mismatch between endpoint and experiment");
         }
 
-        final var model = modelCache.readModel(experiment);
+        final var model = modelCache.readFromPath(experiment);
         final var statistics = experiment.getStatistics();
 
         final int oldQueries = statistics.getNumberOfLearnerQueries();
         final int oldSymbols = statistics.getNumberOfLearnerSymbols();
 
         final int newQueries = queries.size();
-        final List<OUT> result = new ArrayList<>(newQueries);
+        final List<MQOUT> result = new ArrayList<>(newQueries);
         int newSymbols = 0;
 
-        for (QueryDTO query : queries) {
-            newSymbols += query.symbols().size();
-            result.add(transformOutput(model.computeOutput(query.symbols())));
+        for (List<String> query : queries) {
+            newSymbols += query.size();
+            result.add(transformMQOutput(model.computeOutput(query)));
         }
 
         statistics.setNumberOfLearnerQueries(oldQueries + newQueries);
@@ -58,14 +60,14 @@ public abstract class AbstractLearnerEndpoint<M extends RegularAutomaton<?, Stri
         return result;
     }
 
-    protected @Nullable QueryDTO findCounterExample(DBExperiment experiment, String hypothesis)
+    protected @Nullable EQOUT findCounterExample(DBExperiment experiment, HypothesisDTO hypothesis)
             throws IOException, FormatException {
 
         if (experiment.getType() != getModelType()) {
             throw new IllegalArgumentException();
         }
 
-        final var model = parseHypothesis(hypothesis);
+        final var model = parseHypothesis(hypothesis.dot());
         final var hyp = model.model;
         final var alphabet = model.alphabet;
 
@@ -74,7 +76,7 @@ public abstract class AbstractLearnerEndpoint<M extends RegularAutomaton<?, Stri
         }
 
         var mqo = new SimCountOracle<>(hyp);
-        var eqo = modelCache.getEQO(mqo);
+        var eqo = modelCache.getEQO(experiment, mqo);
 
         var ce = eqo.findCounterExample(hyp, alphabet);
 
@@ -85,12 +87,12 @@ public abstract class AbstractLearnerEndpoint<M extends RegularAutomaton<?, Stri
         final int newSymbols = mqo.getNumberOfSymbols();
 
         statistics.setNumberOfTesterQueries(oldQueries + newQueries);
-        statistics.setNumberOfLearnerSymbols(oldSymbols + newSymbols);
+        statistics.setNumberOfTesterSymbols(oldSymbols + newSymbols);
 
         if (ce == null) {
             return null;
         } else {
-            return new QueryDTO(ce.getInput().asList());
+            return transformEQOutput(ce);
         }
     }
 }

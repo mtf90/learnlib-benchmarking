@@ -1,5 +1,5 @@
 import de.learnlib.benchmarking.BenchmarkingModule;
-import de.learnlib.benchmarking.dto.jsonb.GeneratedJsonComponent;
+import de.jsonb.GeneratedJsonComponent;
 import io.avaje.inject.spi.InjectExtension;
 import io.avaje.jsonb.spi.JsonbExtension;
 
@@ -8,14 +8,17 @@ open module de.learnlib.benchmarking {
     requires java.compiler;
 
     requires de.learnlib.api;
+    requires de.learnlib.cli;
     requires de.learnlib.oracle.equivalence;
 
     requires net.automatalib.api;
     requires net.automatalib.core;
     requires net.automatalib.serialization.dot;
+    requires net.automatalib.util;
 
     requires org.slf4j;
 
+    requires io.avaje.applog.slf4j;
     requires io.avaje.http.api;
     requires io.avaje.inject;
     requires io.avaje.jex;
@@ -35,6 +38,8 @@ open module de.learnlib.benchmarking {
     requires io.swagger.v3.oas.annotations;
 
     requires static lombok;
+    requires static org.checkerframework.checker.qual;
+    requires de.learnlib.algorithm.lsharp;
 
     uses jakarta.persistence.spi.PersistenceProvider;
 
