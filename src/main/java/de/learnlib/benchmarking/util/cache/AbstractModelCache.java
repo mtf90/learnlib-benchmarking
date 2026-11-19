@@ -9,6 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 
 import de.learnlib.benchmarking.entity.DBExperiment;
+import de.learnlib.cli.option.Type;
 import de.learnlib.oracle.EquivalenceOracle;
 import de.learnlib.oracle.MembershipOracle;
 import net.automatalib.alphabet.Alphabet;
@@ -26,6 +27,14 @@ public abstract class AbstractModelCache<M extends Output<I, D>, I, D> {
 
     private final Map<String, InputModelData<I, M>> cache;
 
+    public static InputModelData<String, ?> loadModel(Type type, String path) throws IOException, FormatException {
+        return switch (type) {
+            case DFA -> ModelCacheDFA.readDFA(path);
+            case MEALY -> ModelCacheMealy.readMealy(path);
+            default -> throw new UnsupportedOperationException();
+        };
+    }
+
     public AbstractModelCache(Path prefix) {
         cache = new ConcurrentHashMap<>(new LRUCache<>(64));
 
@@ -37,8 +46,6 @@ public abstract class AbstractModelCache<M extends Output<I, D>, I, D> {
             LOGGER.error("Error while walking the directory", e);
         }
     }
-
-    public abstract EquivalenceOracle<M, I, D> getEQO(DBExperiment experiment, MembershipOracle<I, D> mqo);
 
     public M readFromPath(DBExperiment experiment) {
 
@@ -56,6 +63,8 @@ public abstract class AbstractModelCache<M extends Output<I, D>, I, D> {
 
         return entry.model;
     }
+
+    public abstract EquivalenceOracle<M, I, D> getEQO(DBExperiment experiment, MembershipOracle<I, D> mqo);
 
     public abstract InputModelData<I, ? extends M> readFromDot(String dot) throws IOException, FormatException;
 

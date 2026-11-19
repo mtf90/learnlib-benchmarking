@@ -3,8 +3,8 @@ package de.learnlib.benchmarking.api.learner;
 import java.io.IOException;
 import java.util.List;
 
-import de.learnlib.benchmarking.dto.HypothesisDTO;
 import de.learnlib.benchmarking.dto.TransducerResponseDTO;
+import io.avaje.http.api.Body;
 import io.avaje.http.api.Consumes;
 import io.avaje.http.api.Path;
 import io.avaje.http.api.Post;
@@ -25,6 +25,6 @@ public interface LearnerEndpointMealy {
     @Consumes("text/vnd.graphviz")
     @Produces(statusCode = 200)
     @Tag(name = "learner")
-    @Nullable TransducerResponseDTO findCounterExample(long id, HypothesisDTO hypothesis)
+    @Nullable TransducerResponseDTO findCounterExample(long id, @Body String hypothesis)
             throws IOException, FormatException;
 }

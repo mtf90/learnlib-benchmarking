@@ -4,8 +4,9 @@ import java.io.IOException;
 import java.util.List;
 
 import de.learnlib.benchmarking.dto.AcceptorResponseDTO;
-import de.learnlib.benchmarking.dto.HypothesisDTO;
+import io.avaje.http.api.Body;
 import io.avaje.http.api.Consumes;
+import io.avaje.http.api.MediaType;
 import io.avaje.http.api.Path;
 import io.avaje.http.api.Post;
 import io.avaje.http.api.Produces;
@@ -47,9 +48,9 @@ public interface LearnerEndpointDFA {
      *         in case parsing fails
      */
     @Post("/counterexample/{id}")
-    @Consumes("text/vnd.graphviz")
+    @Consumes(MediaType.TEXT_PLAIN)
     @Produces(statusCode = 200)
     @Tag(name = "learner")
     @Nullable
-    AcceptorResponseDTO findCounterExample(long id, HypothesisDTO hypothesis) throws IOException, FormatException;
+    AcceptorResponseDTO findCounterExample(long id, @Body String hypothesis) throws IOException, FormatException;
 }

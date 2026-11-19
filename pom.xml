@@ -18,7 +18,7 @@
 
         <automatalib.version>14.0.0-SNAPSHOT</automatalib.version>
         <avaje-applog.version>1.2</avaje-applog.version>
-        <avaje-http.version>3.13-RC2</avaje-http.version>
+        <avaje-http.version>3.13-RC3</avaje-http.version>
         <avaje-inject.version>12.7</avaje-inject.version>
         <avaje-jex.version>3.6</avaje-jex.version>
         <avaje-jsonb.version>3.16</avaje-jsonb.version>

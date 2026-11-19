@@ -1,7 +1,7 @@
 package de.learnlib.benchmarking.dto;
 
-import de.learnlib.benchmarking.entity.ModelType;
+import de.learnlib.cli.option.Type;
 import io.avaje.jsonb.Json;
 
 @Json
-public record NewExperimentInputDTO(ModelType type, String model, EQOConfig eqoConfig) {}
+public record NewExperimentInputDTO(Type type, String model, EQOConfig eqoConfig) {}

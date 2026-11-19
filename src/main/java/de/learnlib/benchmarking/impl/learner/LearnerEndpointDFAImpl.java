@@ -5,10 +5,9 @@ import java.util.List;
 
 import de.learnlib.benchmarking.api.learner.LearnerEndpointDFA;
 import de.learnlib.benchmarking.dto.AcceptorResponseDTO;
-import de.learnlib.benchmarking.dto.HypothesisDTO;
 import de.learnlib.benchmarking.entity.DBExperiment;
-import de.learnlib.benchmarking.entity.ModelType;
 import de.learnlib.benchmarking.util.cache.ModelCacheDFA;
+import de.learnlib.cli.option.Type;
 import de.learnlib.query.DefaultQuery;
 import io.avaje.http.api.Controller;
 import io.avaje.jex.http.Context;
@@ -38,8 +37,8 @@ public class LearnerEndpointDFAImpl
     }
 
     @Override
-    protected ModelType getModelType() {
-        return ModelType.DFA;
+    protected Type getModelType() {
+        return Type.DFA;
     }
 
     @Override
@@ -65,7 +64,7 @@ public class LearnerEndpointDFAImpl
     }
 
     @Override
-    public @Nullable AcceptorResponseDTO findCounterExample(long id, HypothesisDTO hypothesis)
+    public @Nullable AcceptorResponseDTO findCounterExample(long id, String hypothesis)
             throws IOException, FormatException {
         final var experiment = entityManager.find(DBExperiment.class, id);
         return super.findCounterExample(experiment, hypothesis);

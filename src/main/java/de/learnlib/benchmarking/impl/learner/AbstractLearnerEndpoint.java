@@ -5,11 +5,11 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
-import de.learnlib.benchmarking.dto.HypothesisDTO;
 import de.learnlib.benchmarking.entity.DBExperiment;
-import de.learnlib.benchmarking.entity.ModelType;
+import de.learnlib.benchmarking.exception.TypeMismatchException;
 import de.learnlib.benchmarking.util.SimCountOracle;
 import de.learnlib.benchmarking.util.cache.AbstractModelCache;
+import de.learnlib.cli.option.Type;
 import de.learnlib.query.DefaultQuery;
 import net.automatalib.automaton.concept.SuffixOutput;
 import net.automatalib.exception.FormatException;
@@ -24,7 +24,7 @@ public abstract class AbstractLearnerEndpoint<M extends SuffixOutput<String, D>,
         this.modelCache = modelCache;
     }
 
-    protected abstract ModelType getModelType();
+    protected abstract Type getModelType();
 
     protected abstract MQOUT transformMQOutput(D out);
 
@@ -36,7 +36,7 @@ public abstract class AbstractLearnerEndpoint<M extends SuffixOutput<String, D>,
     protected List<MQOUT> answerQueries(DBExperiment experiment, List<List<String>> queries) {
 
         if (experiment.getType() != getModelType()) {
-            throw new IllegalArgumentException("Type mismatch between endpoint and experiment");
+            throw new TypeMismatchException();
         }
 
         final var model = modelCache.readFromPath(experiment);
@@ -60,14 +60,14 @@ public abstract class AbstractLearnerEndpoint<M extends SuffixOutput<String, D>,
         return result;
     }
 
-    protected @Nullable EQOUT findCounterExample(DBExperiment experiment, HypothesisDTO hypothesis)
+    protected @Nullable EQOUT findCounterExample(DBExperiment experiment, String hypothesis)
             throws IOException, FormatException {
 
         if (experiment.getType() != getModelType()) {
-            throw new IllegalArgumentException();
+            throw new TypeMismatchException();
         }
 
-        final var model = parseHypothesis(hypothesis.dot());
+        final var model = parseHypothesis(hypothesis);
         final var hyp = model.model;
         final var alphabet = model.alphabet;
 
@@ -75,7 +75,8 @@ public abstract class AbstractLearnerEndpoint<M extends SuffixOutput<String, D>,
             throw new IllegalArgumentException("The provided hypothesis has a mismatching alphabet");
         }
 
-        var mqo = new SimCountOracle<>(hyp);
+        var sul = modelCache.readFromPath(experiment);
+        var mqo = new SimCountOracle<>(sul);
         var eqo = modelCache.getEQO(experiment, mqo);
 
         var ce = eqo.findCounterExample(hyp, alphabet);

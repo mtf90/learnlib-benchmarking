@@ -4,11 +4,10 @@ import java.io.IOException;
 import java.util.List;
 
 import de.learnlib.benchmarking.api.learner.LearnerEndpointMealy;
-import de.learnlib.benchmarking.dto.HypothesisDTO;
 import de.learnlib.benchmarking.dto.TransducerResponseDTO;
 import de.learnlib.benchmarking.entity.DBExperiment;
-import de.learnlib.benchmarking.entity.ModelType;
 import de.learnlib.benchmarking.util.cache.ModelCacheMealy;
+import de.learnlib.cli.option.Type;
 import de.learnlib.query.DefaultQuery;
 import io.avaje.http.api.Controller;
 import io.avaje.jex.http.Context;
@@ -39,8 +38,8 @@ public class LearnerEndpointMealyImpl
     }
 
     @Override
-    protected ModelType getModelType() {
-        return ModelType.MEALY;
+    protected Type getModelType() {
+        return Type.MEALY;
     }
 
     @Override
@@ -61,14 +60,12 @@ public class LearnerEndpointMealyImpl
 
     @Override
     public List<List<String>> answerQueries(long id, List<List<String>> queries) {
-        final var experiment = entityManager.find(DBExperiment.class, id);
-        return super.answerQueries(experiment, queries);
+        return super.answerQueries(entityManager.find(DBExperiment.class, id), queries);
     }
 
     @Override
-    public @Nullable TransducerResponseDTO findCounterExample(long id, HypothesisDTO hypothesis)
+    public @Nullable TransducerResponseDTO findCounterExample(long id, String hypothesis)
             throws IOException, FormatException {
-        final var experiment = entityManager.find(DBExperiment.class, id);
-        return super.findCounterExample(experiment, hypothesis);
+        return super.findCounterExample(entityManager.find(DBExperiment.class, id), hypothesis);
     }
 }

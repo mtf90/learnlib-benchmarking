@@ -3,6 +3,8 @@ package de.learnlib.benchmarking.entity;
 import java.time.ZonedDateTime;
 import java.util.List;
 
+import de.learnlib.cli.option.Type;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -20,7 +22,7 @@ import lombok.NoArgsConstructor;
 public class DBExperiment extends DBIdentified {
 
     @Enumerated(EnumType.STRING)
-    private ModelType type;
+    private Type type;
 
     private String model;
 
@@ -31,7 +33,7 @@ public class DBExperiment extends DBIdentified {
     @Lob
     private String eqoConfig;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     private DBStatistics statistics;
 
 }

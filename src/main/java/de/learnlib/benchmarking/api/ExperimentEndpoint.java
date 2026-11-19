@@ -6,6 +6,7 @@ import java.util.List;
 import de.learnlib.benchmarking.dto.ExperimentDTO;
 import de.learnlib.benchmarking.dto.NewExperimentInputDTO;
 import de.learnlib.benchmarking.dto.NewExperimentOutputDTO;
+import de.learnlib.benchmarking.dto.NewTesterExperimentInputDTO;
 import io.avaje.http.api.Get;
 import io.avaje.http.api.Path;
 import io.avaje.http.api.Post;
@@ -27,7 +28,11 @@ public interface ExperimentEndpoint {
     @Tag(name = "misc")
     List<ExperimentDTO> getAllExperiments();
 
-    @Post
+    @Post("learner")
     @Tag(name = "misc")
-    NewExperimentOutputDTO createNew(NewExperimentInputDTO data) throws IOException, FormatException;
+    NewExperimentOutputDTO createForLearner(NewExperimentInputDTO data) throws IOException, FormatException;
+
+    @Post("tester")
+    @Tag(name = "misc")
+    NewExperimentOutputDTO createForTester(NewTesterExperimentInputDTO data) throws IOException, FormatException;
 }

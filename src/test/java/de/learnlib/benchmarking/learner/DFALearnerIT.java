@@ -18,20 +18,18 @@ import de.learnlib.benchmarking.api.learner.LearnerEndpointDFA;
 import de.learnlib.benchmarking.api.learner.LearnerEndpointMealy;
 import de.learnlib.benchmarking.dto.AcceptorResponseDTO;
 import de.learnlib.benchmarking.dto.EQOConfig;
-import de.learnlib.benchmarking.dto.HypothesisDTO;
 import de.learnlib.benchmarking.dto.NewExperimentInputDTO;
 import de.learnlib.benchmarking.dto.NewExperimentOutputDTO;
-import de.learnlib.benchmarking.entity.ModelType;
 import de.learnlib.benchmarking.util.cache.ModelCacheDFA;
 import de.learnlib.cli.option.EQOParams;
 import de.learnlib.cli.option.EQOParams.RandomWpMethod;
 import de.learnlib.cli.option.EQOracle;
+import de.learnlib.cli.option.Type;
 import de.learnlib.oracle.EquivalenceOracle.DFAEquivalenceOracle;
 import de.learnlib.oracle.MembershipOracle.DFAMembershipOracle;
 import de.learnlib.query.DefaultQuery;
 import de.learnlib.query.Query;
 import de.learnlib.util.Experiment;
-import io.avaje.http.api.Client;
 import net.automatalib.alphabet.impl.Alphabets;
 import net.automatalib.automaton.fsa.DFA;
 import net.automatalib.exception.FormatException;
@@ -43,13 +41,9 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-@Client.Import({ExperimentEndpoint.class,
-                LearnerEndpointDFA.class,
-                LearnerEndpointMealy.class,
-                StatisticsEndpoint.class})
 public class DFALearnerIT {
 
-    private static final String MODEL = "dfa/ToyDFA.dot";
+    private static final String MODEL = "dfa/AngluinDFA.dot";
 
     private ExperimentEndpoint experimentEndpoint;
     private LearnerEndpointDFA learnerEndpointDFA;
@@ -69,15 +63,15 @@ public class DFALearnerIT {
     @Test
     public void testCreateMismatchedExperiment() {
         var config = buildConfig();
-        Assert.assertThrows(() -> experimentEndpoint.createNew(new NewExperimentInputDTO(ModelType.MEALY,
-                                                                                         MODEL,
-                                                                                         config)));
+        Assert.assertThrows(() -> experimentEndpoint.createForLearner(new NewExperimentInputDTO(Type.MEALY,
+                                                                                                MODEL,
+                                                                                                config)));
     }
 
     @Test
     public void testCreateExperiment() throws IOException, FormatException {
         var config = buildConfig();
-        var experiment = experimentEndpoint.createNew(new NewExperimentInputDTO(ModelType.DFA, MODEL, config));
+        var experiment = experimentEndpoint.createForLearner(new NewExperimentInputDTO(Type.DFA, MODEL, config));
 
         Assert.assertNotNull(experiment);
         Assert.assertEquals(new HashSet<>(experiment.alphabet()), Set.of("0", "1"));
@@ -91,6 +85,7 @@ public class DFALearnerIT {
         Assert.assertThrows(() -> learnerEndpointMealy.answerQueries(experiment.id(),
                                                                      Collections.singletonList(Collections.singletonList(
                                                                              experiment.alphabet().getFirst()))));
+        Assert.assertThrows(() -> learnerEndpointMealy.findCounterExample(experiment.id(), ""));
     }
 
     @Test(dependsOnMethods = "testCreateExperiment")
@@ -125,8 +120,8 @@ public class DFALearnerIT {
         var eqos = Collections.singletonList(EQOracle.RANDOM_WP);
         var eqoParams = new EQOParams();
         eqoParams.randomWpMethod = new RandomWpMethod();
-        eqoParams.randomWpMethod.bound = 4;
-        eqoParams.randomWpMethod.minimalSize = 4;
+        eqoParams.randomWpMethod.bound = 100;
+        eqoParams.randomWpMethod.minimalSize = 3;
         eqoParams.randomWpMethod.rndLength = 2;
         eqoParams.randomWpMethod.seed = 0;
 
@@ -165,8 +160,7 @@ public class DFALearnerIT {
                                                                           Collection<? extends String> collection) {
             try (Writer w = new StringWriter()) {
                 GraphDOT.write(objects, collection, w);
-                AcceptorResponseDTO response =
-                        learnerEndpointDFA.findCounterExample(experiment.id(), new HypothesisDTO(w.toString()));
+                AcceptorResponseDTO response = learnerEndpointDFA.findCounterExample(experiment.id(), w.toString());
                 if (response == null) {
                     return null;
                 } else {
