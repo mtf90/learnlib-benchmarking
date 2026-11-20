@@ -20,16 +20,22 @@ import de.learnlib.benchmarking.dto.AcceptorResponseDTO;
 import de.learnlib.benchmarking.dto.EQOConfig;
 import de.learnlib.benchmarking.dto.NewExperimentInputDTO;
 import de.learnlib.benchmarking.dto.NewExperimentOutputDTO;
+import de.learnlib.benchmarking.dto.NewTesterExperimentInputDTO;
+import de.learnlib.benchmarking.exception.ExperimentNotFoundException;
+import de.learnlib.benchmarking.exception.TypeMismatchException;
 import de.learnlib.benchmarking.util.cache.ModelCacheDFA;
 import de.learnlib.cli.option.EQOParams;
 import de.learnlib.cli.option.EQOParams.RandomWpMethod;
 import de.learnlib.cli.option.EQOracle;
+import de.learnlib.cli.option.Learner;
 import de.learnlib.cli.option.Type;
 import de.learnlib.oracle.EquivalenceOracle.DFAEquivalenceOracle;
 import de.learnlib.oracle.MembershipOracle.DFAMembershipOracle;
 import de.learnlib.query.DefaultQuery;
 import de.learnlib.query.Query;
 import de.learnlib.util.Experiment;
+import io.avaje.http.client.HttpException;
+import io.avaje.jex.http.HttpStatus;
 import net.automatalib.alphabet.impl.Alphabets;
 import net.automatalib.automaton.fsa.DFA;
 import net.automatalib.exception.FormatException;
@@ -82,10 +88,37 @@ public class DFALearnerIT {
 
     @Test(dependsOnMethods = "testCreateExperiment")
     public void testTypeMismatch() {
-        Assert.assertThrows(() -> learnerEndpointMealy.answerQueries(experiment.id(),
-                                                                     Collections.singletonList(Collections.singletonList(
-                                                                             experiment.alphabet().getFirst()))));
-        Assert.assertThrows(() -> learnerEndpointMealy.findCounterExample(experiment.id(), ""));
+        var e1 = Assert.expectThrows(HttpException.class,
+                                     () -> learnerEndpointMealy.answerQueries(experiment.id(),
+                                                                              Collections.singletonList(Collections.singletonList(
+                                                                                      experiment.alphabet()
+                                                                                                .getFirst()))));
+        Assert.assertEquals(e1.statusCode(), HttpStatus.BAD_REQUEST_400.status());
+        Assert.assertEquals(e1.bodyAsString(), TypeMismatchException.MSG);
+
+        var e2 = Assert.expectThrows(HttpException.class,
+                                     () -> learnerEndpointMealy.findCounterExample(experiment.id(), ""));
+        Assert.assertEquals(e2.statusCode(), HttpStatus.BAD_REQUEST_400.status());
+        Assert.assertEquals(e2.bodyAsString(), TypeMismatchException.MSG);
+    }
+
+    @Test(dependsOnMethods = "testCreateExperiment")
+    public void testKindMismatch() throws IOException, FormatException {
+        var testerExperiment =
+                experimentEndpoint.createForTester(new NewTesterExperimentInputDTO(Type.DFA, MODEL, Learner.TTT));
+
+        var e1 = Assert.expectThrows(HttpException.class,
+                                     () -> learnerEndpointMealy.answerQueries(testerExperiment.id(),
+                                                                              Collections.singletonList(Collections.singletonList(
+                                                                                      testerExperiment.alphabet()
+                                                                                                      .getFirst()))));
+        Assert.assertEquals(e1.statusCode(), HttpStatus.NOT_FOUND_404.status());
+        Assert.assertEquals(e1.bodyAsString(), ExperimentNotFoundException.MSG);
+
+        var e2 = Assert.expectThrows(HttpException.class,
+                                     () -> learnerEndpointMealy.findCounterExample(testerExperiment.id(), ""));
+        Assert.assertEquals(e2.statusCode(), HttpStatus.NOT_FOUND_404.status());
+        Assert.assertEquals(e2.bodyAsString(), ExperimentNotFoundException.MSG);
     }
 
     @Test(dependsOnMethods = "testCreateExperiment")

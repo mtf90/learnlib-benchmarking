@@ -8,10 +8,12 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 
+import de.learnlib.benchmarking.dto.EQOConfig;
 import de.learnlib.benchmarking.entity.DBExperiment;
 import de.learnlib.cli.option.Type;
 import de.learnlib.oracle.EquivalenceOracle;
 import de.learnlib.oracle.MembershipOracle;
+import io.avaje.jsonb.JsonType;
 import net.automatalib.alphabet.Alphabet;
 import net.automatalib.automaton.concept.Output;
 import net.automatalib.exception.FormatException;
@@ -26,6 +28,7 @@ public abstract class AbstractModelCache<M extends Output<I, D>, I, D> {
     protected static final Path ROOT = Path.of(System.getProperty("de.learnlib.systems.root", "systems/"));
 
     private final Map<String, InputModelData<I, M>> cache;
+    private final JsonType<EQOConfig> eqoSerializer;
 
     public static InputModelData<String, ?> loadModel(Type type, String path) throws IOException, FormatException {
         return switch (type) {
@@ -35,8 +38,9 @@ public abstract class AbstractModelCache<M extends Output<I, D>, I, D> {
         };
     }
 
-    public AbstractModelCache(Path prefix) {
-        cache = new ConcurrentHashMap<>(new LRUCache<>(64));
+    public AbstractModelCache(Path prefix, JsonType<EQOConfig> eqoSerializer) {
+        this.cache = new ConcurrentHashMap<>(new LRUCache<>(64));
+        this.eqoSerializer = eqoSerializer;
 
         Path startPath = ROOT.resolve(prefix);
 
@@ -64,7 +68,11 @@ public abstract class AbstractModelCache<M extends Output<I, D>, I, D> {
         return entry.model;
     }
 
-    public abstract EquivalenceOracle<M, I, D> getEQO(DBExperiment experiment, MembershipOracle<I, D> mqo);
+    public EquivalenceOracle<M, I, D> getEQO(String eqoConfig, MembershipOracle<I, D> mqo) {
+        return getEQO(eqoSerializer.fromJson(eqoConfig), mqo);
+    }
+
+    public abstract EquivalenceOracle<M, I, D> getEQO(EQOConfig eqoConfig, MembershipOracle<I, D> mqo);
 
     public abstract InputModelData<I, ? extends M> readFromDot(String dot) throws IOException, FormatException;
 

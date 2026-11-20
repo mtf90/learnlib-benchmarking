@@ -17,4 +17,8 @@ public abstract class RunnerCache<M extends SuffixOutput<String, D>, D> {
         POOL.put(id, runner);
     }
 
+    public void removeRunner(long id) {
+        POOL.remove(id);
+    }
+
 }

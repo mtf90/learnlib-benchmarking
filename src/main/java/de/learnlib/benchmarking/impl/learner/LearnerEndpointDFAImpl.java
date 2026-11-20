@@ -6,6 +6,7 @@ import java.util.List;
 import de.learnlib.benchmarking.api.learner.LearnerEndpointDFA;
 import de.learnlib.benchmarking.dto.AcceptorResponseDTO;
 import de.learnlib.benchmarking.entity.DBExperiment;
+import de.learnlib.benchmarking.entity.DBLearnerExperiment;
 import de.learnlib.benchmarking.util.cache.ModelCacheDFA;
 import de.learnlib.cli.option.Type;
 import de.learnlib.query.DefaultQuery;
@@ -59,14 +60,12 @@ public class LearnerEndpointDFAImpl
 
     @Override
     public List<Boolean> answerQueries(long id, List<List<String>> queries) {
-        final var experiment = entityManager.find(DBExperiment.class, id);
-        return super.answerQueries(experiment, queries);
+        return super.answerQueries(entityManager.find(DBLearnerExperiment.class, id), queries);
     }
 
     @Override
     public @Nullable AcceptorResponseDTO findCounterExample(long id, String hypothesis)
             throws IOException, FormatException {
-        final var experiment = entityManager.find(DBExperiment.class, id);
-        return super.findCounterExample(experiment, hypothesis);
+        return super.findCounterExample(entityManager.find(DBLearnerExperiment.class, id), hypothesis);
     }
 }

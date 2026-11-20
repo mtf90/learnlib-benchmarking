@@ -6,6 +6,8 @@ import java.util.HashSet;
 import java.util.List;
 
 import de.learnlib.benchmarking.entity.DBExperiment;
+import de.learnlib.benchmarking.entity.DBLearnerExperiment;
+import de.learnlib.benchmarking.exception.ExperimentNotFoundException;
 import de.learnlib.benchmarking.exception.TypeMismatchException;
 import de.learnlib.benchmarking.util.SimCountOracle;
 import de.learnlib.benchmarking.util.cache.AbstractModelCache;
@@ -33,7 +35,11 @@ public abstract class AbstractLearnerEndpoint<M extends SuffixOutput<String, D>,
     protected abstract InputModelData<String, ? extends M> parseHypothesis(String hypothesis)
             throws IOException, FormatException;
 
-    protected List<MQOUT> answerQueries(DBExperiment experiment, List<List<String>> queries) {
+    protected List<MQOUT> answerQueries(@Nullable DBLearnerExperiment experiment, List<List<String>> queries) {
+
+        if (experiment == null) {
+            throw new ExperimentNotFoundException();
+        }
 
         if (experiment.getType() != getModelType()) {
             throw new TypeMismatchException();
@@ -60,8 +66,12 @@ public abstract class AbstractLearnerEndpoint<M extends SuffixOutput<String, D>,
         return result;
     }
 
-    protected @Nullable EQOUT findCounterExample(DBExperiment experiment, String hypothesis)
+    protected @Nullable EQOUT findCounterExample(@Nullable DBLearnerExperiment experiment, String hypothesis)
             throws IOException, FormatException {
+
+        if (experiment == null) {
+            throw new ExperimentNotFoundException();
+        }
 
         if (experiment.getType() != getModelType()) {
             throw new TypeMismatchException();
@@ -77,7 +87,7 @@ public abstract class AbstractLearnerEndpoint<M extends SuffixOutput<String, D>,
 
         var sul = modelCache.readFromPath(experiment);
         var mqo = new SimCountOracle<>(sul);
-        var eqo = modelCache.getEQO(experiment, mqo);
+        var eqo = modelCache.getEQO(experiment.getEqoConfig(), mqo);
 
         var ce = eqo.findCounterExample(hyp, alphabet);
 

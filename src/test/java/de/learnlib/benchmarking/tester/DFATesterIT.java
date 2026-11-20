@@ -14,10 +14,17 @@ import de.learnlib.benchmarking.api.ExperimentEndpoint;
 import de.learnlib.benchmarking.api.StatisticsEndpoint;
 import de.learnlib.benchmarking.api.tester.TesterEndpointDFA;
 import de.learnlib.benchmarking.api.tester.TesterEndpointMealy;
+import de.learnlib.benchmarking.dto.EQOConfig;
+import de.learnlib.benchmarking.dto.NewExperimentInputDTO;
 import de.learnlib.benchmarking.dto.NewExperimentOutputDTO;
 import de.learnlib.benchmarking.dto.NewTesterExperimentInputDTO;
+import de.learnlib.benchmarking.exception.ExperimentNotFoundException;
+import de.learnlib.benchmarking.exception.TypeMismatchException;
+import de.learnlib.cli.option.EQOParams;
 import de.learnlib.cli.option.Learner;
 import de.learnlib.cli.option.Type;
+import io.avaje.http.client.HttpException;
+import io.avaje.jex.http.HttpStatus;
 import net.automatalib.exception.FormatException;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
@@ -63,9 +70,34 @@ public class DFATesterIT {
 
     @Test(dependsOnMethods = "testCreateExperiment")
     public void testTypeMismatch() {
-        Assert.assertThrows(() -> testerEndpointMealy.getHypothesis(experiment.id()));
-        Assert.assertThrows(() -> testerEndpointMealy.checkForCounterexamples(experiment.id(),
-                                                                              Collections.emptyList()));
+        var e1 = Assert.expectThrows(HttpException.class, () -> testerEndpointMealy.getHypothesis(experiment.id()));
+        Assert.assertEquals(e1.statusCode(), HttpStatus.BAD_REQUEST_400.status());
+        Assert.assertEquals(e1.bodyAsString(), TypeMismatchException.MSG);
+
+        var e2 = Assert.expectThrows(HttpException.class,
+                                     () -> testerEndpointMealy.checkForCounterexamples(experiment.id(),
+                                                                                       Collections.emptyList()));
+        Assert.assertEquals(e2.statusCode(), HttpStatus.BAD_REQUEST_400.status());
+        Assert.assertEquals(e2.bodyAsString(), TypeMismatchException.MSG);
+    }
+
+    @Test(dependsOnMethods = "testCreateExperiment")
+    public void testKindMismatch() throws IOException, FormatException {
+        var learnerExperiment = experimentEndpoint.createForLearner(new NewExperimentInputDTO(Type.DFA,
+                                                                                              MODEL,
+                                                                                              new EQOConfig(Collections.emptyList(),
+                                                                                                            new EQOParams())));
+
+        var e1 = Assert.expectThrows(HttpException.class,
+                                     () -> testerEndpointMealy.getHypothesis(learnerExperiment.id()));
+        Assert.assertEquals(e1.statusCode(), HttpStatus.NOT_FOUND_404.status());
+        Assert.assertEquals(e1.bodyAsString(), ExperimentNotFoundException.MSG);
+
+        var e2 = Assert.expectThrows(HttpException.class,
+                                     () -> testerEndpointMealy.checkForCounterexamples(learnerExperiment.id(),
+                                                                                       Collections.emptyList()));
+        Assert.assertEquals(e2.statusCode(), HttpStatus.NOT_FOUND_404.status());
+        Assert.assertEquals(e2.bodyAsString(), ExperimentNotFoundException.MSG);
     }
 
     @Test(dependsOnMethods = "testCreateExperiment")

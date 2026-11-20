@@ -24,6 +24,6 @@ public interface TesterEndpointDFA {
     @Post("/counterexample/{id}")
     @Tag(name = "tester")
     @Nullable AcceptorResponseDTO checkForCounterexamples(long id, List<List<String>> testQueries)
-            throws ExecutionException, InterruptedException;
+            throws ExecutionException, InterruptedException, IOException;
 
 }

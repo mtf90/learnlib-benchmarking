@@ -6,6 +6,7 @@ import java.util.List;
 import de.learnlib.benchmarking.api.learner.LearnerEndpointMealy;
 import de.learnlib.benchmarking.dto.TransducerResponseDTO;
 import de.learnlib.benchmarking.entity.DBExperiment;
+import de.learnlib.benchmarking.entity.DBLearnerExperiment;
 import de.learnlib.benchmarking.util.cache.ModelCacheMealy;
 import de.learnlib.cli.option.Type;
 import de.learnlib.query.DefaultQuery;
@@ -60,12 +61,12 @@ public class LearnerEndpointMealyImpl
 
     @Override
     public List<List<String>> answerQueries(long id, List<List<String>> queries) {
-        return super.answerQueries(entityManager.find(DBExperiment.class, id), queries);
+        return super.answerQueries(entityManager.find(DBLearnerExperiment.class, id), queries);
     }
 
     @Override
     public @Nullable TransducerResponseDTO findCounterExample(long id, String hypothesis)
             throws IOException, FormatException {
-        return super.findCounterExample(entityManager.find(DBExperiment.class, id), hypothesis);
+        return super.findCounterExample(entityManager.find(DBLearnerExperiment.class, id), hypothesis);
     }
 }

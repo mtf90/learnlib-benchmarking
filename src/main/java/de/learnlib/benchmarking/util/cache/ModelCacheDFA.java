@@ -6,7 +6,6 @@ import java.nio.file.Path;
 import java.util.Collections;
 
 import de.learnlib.benchmarking.dto.EQOConfig;
-import de.learnlib.benchmarking.entity.DBExperiment;
 import de.learnlib.cli.factory.EQOFactory;
 import de.learnlib.cli.option.Options;
 import de.learnlib.oracle.EquivalenceOracle;
@@ -21,17 +20,13 @@ import net.automatalib.serialization.dot.DOTParsers;
 @Singleton
 public class ModelCacheDFA extends AbstractModelCache<DFA<?, String>, String, Boolean> {
 
-    private final JsonType<EQOConfig> eqoSerializer;
-
     public ModelCacheDFA(JsonType<EQOConfig> eqoSerializer) {
-        super(Path.of("dfa"));
-        this.eqoSerializer = eqoSerializer;
+        super(Path.of("dfa"), eqoSerializer);
     }
 
     @Override
-    public EquivalenceOracle<DFA<?, String>, String, Boolean> getEQO(DBExperiment experiment,
+    public EquivalenceOracle<DFA<?, String>, String, Boolean> getEQO(EQOConfig eqoConfig,
                                                                      MembershipOracle<String, Boolean> mqo) {
-        final var eqoConfig = eqoSerializer.fromJson(experiment.getEqoConfig());
         final var options = new Options();
 
         options.sul = Collections.emptyList();

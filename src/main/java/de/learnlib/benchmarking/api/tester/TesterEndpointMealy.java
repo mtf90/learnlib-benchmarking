@@ -25,6 +25,6 @@ public interface TesterEndpointMealy {
     @Tag(name = "tester")
     @Nullable
     TransducerResponseDTO checkForCounterexamples(long id, List<List<String>> testQueries)
-            throws ExecutionException, InterruptedException;
+            throws ExecutionException, InterruptedException, IOException;
 
 }

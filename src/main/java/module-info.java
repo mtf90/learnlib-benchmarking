@@ -9,14 +9,13 @@ open module de.learnlib.benchmarking {
 
     requires de.learnlib.api;
     requires de.learnlib.cli;
+    requires de.learnlib.common.util;
     requires de.learnlib.oracle.equivalence;
 
     requires net.automatalib.api;
     requires net.automatalib.core;
     requires net.automatalib.serialization.dot;
     requires net.automatalib.util;
-
-    requires org.slf4j;
 
     requires io.avaje.applog.slf4j;
     requires io.avaje.http.api;
@@ -35,11 +34,12 @@ open module de.learnlib.benchmarking {
 
     requires org.hsqldb;
 
+    requires org.slf4j;
+
     requires io.swagger.v3.oas.annotations;
 
     requires static lombok;
     requires static org.checkerframework.checker.qual;
-    requires de.learnlib.algorithm.lsharp;
 
     uses jakarta.persistence.spi.PersistenceProvider;
 

@@ -3,9 +3,9 @@ package de.learnlib.benchmarking.util.cache;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.util.Collections;
 
 import de.learnlib.benchmarking.dto.EQOConfig;
-import de.learnlib.benchmarking.entity.DBExperiment;
 import de.learnlib.cli.factory.EQOFactory;
 import de.learnlib.cli.option.Options;
 import de.learnlib.oracle.EquivalenceOracle;
@@ -21,19 +21,16 @@ import net.automatalib.word.Word;
 @Singleton
 public class ModelCacheMealy extends AbstractModelCache<MealyMachine<?, String, ?, String>, String, Word<String>> {
 
-    private final JsonType<EQOConfig> eqoSerializer;
-
     public ModelCacheMealy(JsonType<EQOConfig> eqoSerializer) {
-        super(Path.of("mealy"));
-        this.eqoSerializer = eqoSerializer;
+        super(Path.of("mealy"), eqoSerializer);
     }
 
     @Override
-    public EquivalenceOracle<MealyMachine<?, String, ?, String>, String, Word<String>> getEQO(DBExperiment experiment,
+    public EquivalenceOracle<MealyMachine<?, String, ?, String>, String, Word<String>> getEQO(EQOConfig eqoConfig,
                                                                                               MembershipOracle<String, Word<String>> mqo) {
-        final var eqoConfig = eqoSerializer.fromJson(experiment.getEqoConfig());
         final var options = new Options();
 
+        options.sul = Collections.emptyList();
         options.eqos = eqoConfig.oracles();
         options.eqoParams = eqoConfig.params();
 

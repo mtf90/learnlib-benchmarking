@@ -6,23 +6,19 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-import de.learnlib.benchmarking.api.tester.TesterEndpointDFA;
 import de.learnlib.benchmarking.api.tester.TesterEndpointMealy;
-import de.learnlib.benchmarking.dto.AcceptorResponseDTO;
 import de.learnlib.benchmarking.dto.TransducerResponseDTO;
-import de.learnlib.benchmarking.entity.DBExperiment;
-import de.learnlib.benchmarking.util.cache.ModelCacheDFA;
+import de.learnlib.benchmarking.entity.DBTesterExperiment;
 import de.learnlib.benchmarking.util.cache.ModelCacheMealy;
-import de.learnlib.benchmarking.util.runner.RunnerCacheDFA;
 import de.learnlib.benchmarking.util.runner.RunnerCacheMealy;
 import de.learnlib.cli.option.Type;
 import de.learnlib.query.DefaultQuery;
 import io.avaje.http.api.Controller;
 import io.avaje.jex.http.Context;
 import jakarta.persistence.EntityManager;
-import net.automatalib.automaton.fsa.DFA;
 import net.automatalib.automaton.transducer.MealyMachine;
 import net.automatalib.serialization.dot.GraphDOT;
+import net.automatalib.util.automaton.Automata;
 import net.automatalib.word.Word;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -55,13 +51,20 @@ public class TesterEndpointMealyImpl
     }
 
     @Override
+    protected boolean testEquivalence(MealyMachine<?, String, ?, String> hyp,
+                                      MealyMachine<?, String, ?, String> model,
+                                      Collection<String> inputs) {
+        return Automata.testEquivalence(hyp, model, inputs);
+    }
+
+    @Override
     public String getHypothesis(long id) throws ExecutionException, InterruptedException, IOException {
-        return super.getHypothesis(entityManager.find(DBExperiment.class, id));
+        return super.getHypothesis(entityManager.find(DBTesterExperiment.class, id));
     }
 
     @Override
     public @Nullable TransducerResponseDTO checkForCounterexamples(long id, List<List<String>> testQueries)
-            throws ExecutionException, InterruptedException {
-        return super.checkForCounterexamples(entityManager.find(DBExperiment.class, id), testQueries);
+            throws ExecutionException, InterruptedException, IOException {
+        return super.checkForCounterexamples(entityManager.find(DBTesterExperiment.class, id), testQueries);
     }
 }

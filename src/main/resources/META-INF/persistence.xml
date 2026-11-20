@@ -10,6 +10,9 @@
 
         <class>de.learnlib.benchmarking.entity.DBIdentified</class>
         <class>de.learnlib.benchmarking.entity.DBExperiment</class>
+        <class>de.learnlib.benchmarking.entity.DBLearnerExperiment</class>
+        <class>de.learnlib.benchmarking.entity.DBRunnerExperiment</class>
+        <class>de.learnlib.benchmarking.entity.DBTesterExperiment</class>
         <class>de.learnlib.benchmarking.entity.DBStatistics</class>
 
         <properties>
