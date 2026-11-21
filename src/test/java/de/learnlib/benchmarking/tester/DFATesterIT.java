@@ -10,6 +10,7 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
 import de.learnlib.benchmarking.ServerLifecycleListener;
+import de.learnlib.benchmarking.api.EquivalenceEndpoint;
 import de.learnlib.benchmarking.api.ExperimentEndpoint;
 import de.learnlib.benchmarking.api.StatisticsEndpoint;
 import de.learnlib.benchmarking.api.tester.TesterEndpointDFA;
@@ -38,6 +39,7 @@ public class DFATesterIT {
     private TesterEndpointDFA testerEndpointDFA;
     private TesterEndpointMealy testerEndpointMealy;
     private StatisticsEndpoint statisticsEndpoint;
+    private EquivalenceEndpoint equivalenceEndpoint;
 
     private NewExperimentOutputDTO experiment;
 
@@ -47,6 +49,7 @@ public class DFATesterIT {
         this.testerEndpointDFA = ServerLifecycleListener.getClient().create(TesterEndpointDFA.class);
         this.testerEndpointMealy = ServerLifecycleListener.getClient().create(TesterEndpointMealy.class);
         this.statisticsEndpoint = ServerLifecycleListener.getClient().create(StatisticsEndpoint.class);
+        this.equivalenceEndpoint = ServerLifecycleListener.getClient().create(EquivalenceEndpoint.class);
     }
 
     @Test
@@ -70,10 +73,6 @@ public class DFATesterIT {
 
     @Test(dependsOnMethods = "testCreateExperiment")
     public void testTypeMismatch() {
-        var e1 = Assert.expectThrows(HttpException.class, () -> testerEndpointMealy.getHypothesis(experiment.id()));
-        Assert.assertEquals(e1.statusCode(), HttpStatus.BAD_REQUEST_400.status());
-        Assert.assertEquals(e1.bodyAsString(), TypeMismatchException.MSG);
-
         var e2 = Assert.expectThrows(HttpException.class,
                                      () -> testerEndpointMealy.checkForCounterexamples(experiment.id(),
                                                                                        Collections.emptyList()));
@@ -120,6 +119,16 @@ public class DFATesterIT {
     }
 
     @Test(dependsOnMethods = "testFetchInitialHypothesis")
+    public void testInitialEquivalence() throws IOException, FormatException {
+        try (var is = DFATesterIT.class.getResourceAsStream("/init_dfa.dot")) {
+            Assert.assertNotNull(is);
+            Assert.assertFalse(equivalenceEndpoint.testEquivalence(experiment.id(),
+                                                                  new String(is.readAllBytes(),
+                                                                             StandardCharsets.UTF_8)));
+        }
+    }
+
+    @Test(dependsOnMethods = "testInitialEquivalence")
     public void testPostQueries() throws ExecutionException, InterruptedException, IOException {
 
         var statistics = statisticsEndpoint.getStatistics(experiment.id());
@@ -164,15 +173,17 @@ public class DFATesterIT {
 
         Assert.assertTrue(statistics.numberOfLearnerQueries() > oldLearnerQueries);
         Assert.assertTrue(statistics.numberOfLearnerSymbols() > oldLearnerSymbols);
-        Assert.assertEquals(statistics.numberOfTesterQueries(), 5);
-        Assert.assertEquals(statistics.numberOfTesterSymbols(), 22);
+        Assert.assertEquals(statistics.numberOfTesterQueries(), 4);
+        Assert.assertEquals(statistics.numberOfTesterSymbols(), 17);
     }
 
     @Test(dependsOnMethods = "testPostQueries")
-    public void testNoMoreCounterexamples() {
-        Assert.assertThrows(() -> testerEndpointDFA.checkForCounterexamples(experiment.id(),
-                                                                            Collections.singletonList(Collections.nCopies(
-                                                                                    4,
-                                                                                    "0"))));
+    public void testFinalEquivalence() throws IOException, FormatException {
+        try (var is = DFATesterIT.class.getResourceAsStream("/final_dfa.dot")) {
+            Assert.assertNotNull(is);
+            Assert.assertTrue(equivalenceEndpoint.testEquivalence(experiment.id(),
+                                                                  new String(is.readAllBytes(),
+                                                                             StandardCharsets.UTF_8)));
+        }
     }
 }

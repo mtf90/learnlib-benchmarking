@@ -25,8 +25,10 @@ open module de.learnlib.benchmarking {
     requires io.avaje.jsonb;
     requires io.avaje.jsonb.plugin;
 
-    requires jakarta.persistence;
     requires jakarta.inject;
+    requires jakarta.persistence;
+
+    requires org.apache.fory.core;
 
     requires org.eclipse.persistence.jpa;
     requires org.eclipse.persistence.jpa.jpql;

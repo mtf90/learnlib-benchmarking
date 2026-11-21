@@ -86,13 +86,11 @@ public class ExperimentEndpointImpl implements ExperimentEndpoint {
         final var loadedModel = AbstractModelCache.loadModel(type, model);
         final var alphabet = new ArrayList<>(loadedModel.alphabet);
 
-        final var experiment = new DBTesterExperiment(type, model, ZonedDateTime.now(), alphabet, null);
+        final var experiment = new DBTesterExperiment(type, model, ZonedDateTime.now(), alphabet, data.learner());
 
         entityManager.persist(experiment);
 
-        var runner = runnerManager.createAndRegisterRunner(experiment, data.learner(), type);
-
-        runner.start(experiment);
+        runnerManager.startLearningProcessSync(experiment);
 
         return new NewExperimentOutputDTO(experiment.getId(), alphabet);
     }
@@ -112,11 +110,11 @@ public class ExperimentEndpointImpl implements ExperimentEndpoint {
         entityManager.persist(experiment);
         entityManager.flush(); // flush to make data visible in runner
 
-        runnerManager.submitRunner(experiment,
-                                   entityManager.getEntityManagerFactory(),
-                                   data.learner(),
-                                   type,
-                                   data.eqoConfig());
+        runnerManager.submitRunnerAsync(experiment,
+                                        entityManager.getEntityManagerFactory(),
+                                        data.learner(),
+                                        type,
+                                        data.eqoConfig());
 
         return new NewExperimentOutputDTO(experiment.getId(), alphabet);
     }

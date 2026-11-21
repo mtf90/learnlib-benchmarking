@@ -3,8 +3,11 @@ package de.learnlib.benchmarking.entity;
 import java.time.ZonedDateTime;
 import java.util.List;
 
+import de.learnlib.cli.option.Learner;
 import de.learnlib.cli.option.Type;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Lob;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -13,20 +16,23 @@ import lombok.Setter;
 
 @Entity
 @Getter
-@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class DBTesterExperiment extends DBExperiment {
 
     @Lob
-    private String finalHypothesis;
+    @Setter
+    private byte[] learnerState;
+
+    @Enumerated(EnumType.STRING)
+    private Learner learner;
 
     public DBTesterExperiment(Type type,
                               String model,
                               ZonedDateTime timestamp,
                               List<String> alphabet,
-                              String finalHypothesis) {
+                              Learner learner) {
         super(type, model, timestamp, alphabet, new DBStatistics());
-        this.finalHypothesis = finalHypothesis;
+        this.learner = learner;
     }
 
     @Override

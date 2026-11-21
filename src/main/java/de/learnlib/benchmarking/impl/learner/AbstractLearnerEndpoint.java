@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
-import de.learnlib.benchmarking.entity.DBExperiment;
 import de.learnlib.benchmarking.entity.DBLearnerExperiment;
 import de.learnlib.benchmarking.exception.ExperimentNotFoundException;
 import de.learnlib.benchmarking.exception.TypeMismatchException;
@@ -20,9 +19,9 @@ import org.jspecify.annotations.Nullable;
 
 public abstract class AbstractLearnerEndpoint<M extends SuffixOutput<String, D>, D, MQOUT, EQOUT> {
 
-    protected final AbstractModelCache<M, String, D> modelCache;
+    protected final AbstractModelCache<M, D> modelCache;
 
-    public AbstractLearnerEndpoint(AbstractModelCache<M, String, D> modelCache) {
+    public AbstractLearnerEndpoint(AbstractModelCache<M, D> modelCache) {
         this.modelCache = modelCache;
     }
 

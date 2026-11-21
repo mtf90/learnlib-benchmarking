@@ -1,4 +1,5 @@
-@Client.Import({ExperimentEndpoint.class,
+@Client.Import({EquivalenceEndpoint.class,
+                ExperimentEndpoint.class,
                 LearnerEndpointDFA.class,
                 LearnerEndpointMealy.class,
                 StatisticsEndpoint.class,
@@ -6,6 +7,7 @@
                 TesterEndpointMealy.class})
 package de.learnlib.benchmarking;
 
+import de.learnlib.benchmarking.api.EquivalenceEndpoint;
 import de.learnlib.benchmarking.api.ExperimentEndpoint;
 import de.learnlib.benchmarking.api.StatisticsEndpoint;
 import de.learnlib.benchmarking.api.learner.LearnerEndpointDFA;

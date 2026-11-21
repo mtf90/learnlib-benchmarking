@@ -15,12 +15,12 @@ import lombok.Setter;
 
 @Entity
 @Getter
-@Setter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class DBRunnerExperiment extends DBExperiment {
 
     @Enumerated(EnumType.STRING)
+    @Setter
     private Status status;
 
     public DBRunnerExperiment(Type type, String model, ZonedDateTime timestamp, List<String> alphabet, Status status) {
