@@ -13,12 +13,11 @@ import de.learnlib.benchmarking.dto.NewExperimentOutputDTO;
 import de.learnlib.benchmarking.dto.NewRunnerExperimentInputDTO;
 import de.learnlib.benchmarking.dto.NewTesterExperimentInputDTO;
 import de.learnlib.benchmarking.entity.DBExperiment;
-import de.learnlib.benchmarking.entity.DBExperiment_;
 import de.learnlib.benchmarking.entity.DBLearnerExperiment;
 import de.learnlib.benchmarking.entity.DBRunnerExperiment;
 import de.learnlib.benchmarking.entity.DBRunnerExperiment.Status;
 import de.learnlib.benchmarking.entity.DBTesterExperiment;
-import de.learnlib.benchmarking.util.cache.AbstractModelCache;
+import de.learnlib.benchmarking.util.cache.AbstractModelService;
 import de.learnlib.benchmarking.util.runner.RunnerManager;
 import io.avaje.http.api.Controller;
 import io.avaje.jex.http.Context;
@@ -54,7 +53,7 @@ public class ExperimentEndpointImpl implements ExperimentEndpoint {
         var builder = entityManager.getCriteriaBuilder();
         var q = builder.createQuery(DBExperiment.class);
         var from = q.from(DBExperiment.class);
-        var query = entityManager.createQuery(q.select(from).orderBy(builder.asc(from.get(DBExperiment_.timestamp))));
+        var query = entityManager.createQuery(q.select(from));
 
         return query.getResultStream().map(ExperimentDTO::new).toList();
     }
@@ -66,7 +65,7 @@ public class ExperimentEndpointImpl implements ExperimentEndpoint {
         final var model = data.model();
         final var eqoConfig = eqoSerializer.toJson(data.eqoConfig());
 
-        final var loadedModel = AbstractModelCache.loadModel(type, model);
+        final var loadedModel = AbstractModelService.loadModel(type, model);
         final var alphabet = new ArrayList<>(loadedModel.alphabet);
 
         final var experiment = new DBLearnerExperiment(type, model, ZonedDateTime.now(), alphabet, eqoConfig);
@@ -83,7 +82,7 @@ public class ExperimentEndpointImpl implements ExperimentEndpoint {
         final var type = data.type();
         final var model = data.model();
 
-        final var loadedModel = AbstractModelCache.loadModel(type, model);
+        final var loadedModel = AbstractModelService.loadModel(type, model);
         final var alphabet = new ArrayList<>(loadedModel.alphabet);
 
         final var experiment = new DBTesterExperiment(type, model, ZonedDateTime.now(), alphabet, data.learner());
@@ -102,7 +101,7 @@ public class ExperimentEndpointImpl implements ExperimentEndpoint {
         final var type = data.type();
         final var model = data.model();
 
-        final var loadedModel = AbstractModelCache.loadModel(type, model);
+        final var loadedModel = AbstractModelService.loadModel(type, model);
         final var alphabet = new ArrayList<>(loadedModel.alphabet);
 
         final var experiment = new DBRunnerExperiment(type, model, ZonedDateTime.now(), alphabet, Status.RUNNING);

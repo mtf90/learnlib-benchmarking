@@ -5,9 +5,8 @@ import java.util.List;
 
 import de.learnlib.benchmarking.api.learner.LearnerEndpointDFA;
 import de.learnlib.benchmarking.dto.AcceptorResponseDTO;
-import de.learnlib.benchmarking.entity.DBExperiment;
 import de.learnlib.benchmarking.entity.DBLearnerExperiment;
-import de.learnlib.benchmarking.util.cache.ModelCacheDFA;
+import de.learnlib.benchmarking.util.cache.ModelServiceDFA;
 import de.learnlib.cli.option.Type;
 import de.learnlib.query.DefaultQuery;
 import io.avaje.http.api.Controller;
@@ -32,7 +31,7 @@ public class LearnerEndpointDFAImpl
      * @param ctx
      *         the context
      */
-    public LearnerEndpointDFAImpl(Context ctx, ModelCacheDFA modelCache) {
+    public LearnerEndpointDFAImpl(Context ctx, ModelServiceDFA modelCache) {
         super(modelCache);
         this.entityManager = ctx.attribute(EntityManager.class);
     }
@@ -55,7 +54,7 @@ public class LearnerEndpointDFAImpl
     @Override
     protected InputModelData<String, ? extends DFA<?, String>> parseHypothesis(String hypothesis)
             throws IOException, FormatException {
-        return super.modelCache.readFromDot(hypothesis);
+        return super.modelService.readFromDot(hypothesis);
     }
 
     @Override

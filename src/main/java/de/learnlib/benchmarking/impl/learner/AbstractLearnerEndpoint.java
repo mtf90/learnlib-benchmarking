@@ -9,7 +9,7 @@ import de.learnlib.benchmarking.entity.DBLearnerExperiment;
 import de.learnlib.benchmarking.exception.ExperimentNotFoundException;
 import de.learnlib.benchmarking.exception.TypeMismatchException;
 import de.learnlib.benchmarking.util.SimCountOracle;
-import de.learnlib.benchmarking.util.cache.AbstractModelCache;
+import de.learnlib.benchmarking.util.cache.AbstractModelService;
 import de.learnlib.cli.option.Type;
 import de.learnlib.query.DefaultQuery;
 import net.automatalib.automaton.concept.SuffixOutput;
@@ -19,10 +19,10 @@ import org.jspecify.annotations.Nullable;
 
 public abstract class AbstractLearnerEndpoint<M extends SuffixOutput<String, D>, D, MQOUT, EQOUT> {
 
-    protected final AbstractModelCache<M, D> modelCache;
+    protected final AbstractModelService<M, D> modelService;
 
-    public AbstractLearnerEndpoint(AbstractModelCache<M, D> modelCache) {
-        this.modelCache = modelCache;
+    public AbstractLearnerEndpoint(AbstractModelService<M, D> modelService) {
+        this.modelService = modelService;
     }
 
     protected abstract Type getModelType();
@@ -44,7 +44,7 @@ public abstract class AbstractLearnerEndpoint<M extends SuffixOutput<String, D>,
             throw new TypeMismatchException();
         }
 
-        final var model = modelCache.readFromPath(experiment);
+        final var model = modelService.readFromPath(experiment);
         final var statistics = experiment.getStatistics();
 
         final int oldQueries = statistics.getNumberOfLearnerQueries();
@@ -84,9 +84,9 @@ public abstract class AbstractLearnerEndpoint<M extends SuffixOutput<String, D>,
             throw new IllegalArgumentException("The provided hypothesis has a mismatching alphabet");
         }
 
-        var sul = modelCache.readFromPath(experiment);
+        var sul = modelService.readFromPath(experiment);
         var mqo = new SimCountOracle<>(sul);
-        var eqo = modelCache.getEQO(experiment.getEqoConfig(), mqo);
+        var eqo = modelService.getEQO(experiment.getEqoConfig(), mqo);
 
         var ce = eqo.findCounterExample(hyp, alphabet);
 

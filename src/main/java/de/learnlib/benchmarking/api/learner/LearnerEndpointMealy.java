@@ -14,7 +14,7 @@ import net.automatalib.exception.FormatException;
 import org.jspecify.annotations.Nullable;
 
 @Path("/learner/mealy")
-public interface LearnerEndpointMealy {
+public interface LearnerEndpointMealy extends LearnerEndpoint<List<List<String>>, TransducerResponseDTO> {
 
     @Post("/queries/{id}")
     @Produces(statusCode = 200)

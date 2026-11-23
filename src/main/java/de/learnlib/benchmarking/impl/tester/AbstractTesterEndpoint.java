@@ -7,7 +7,7 @@ import java.util.Objects;
 import de.learnlib.benchmarking.entity.DBTesterExperiment;
 import de.learnlib.benchmarking.exception.ExperimentNotFoundException;
 import de.learnlib.benchmarking.exception.TypeMismatchException;
-import de.learnlib.benchmarking.util.cache.AbstractModelCache;
+import de.learnlib.benchmarking.util.cache.AbstractModelService;
 import de.learnlib.cli.option.Type;
 import de.learnlib.query.DefaultQuery;
 import net.automatalib.automaton.concept.SuffixOutput;
@@ -16,9 +16,9 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 public abstract class AbstractTesterEndpoint<M extends SuffixOutput<String, D>, D, OUT> {
 
-    private final AbstractModelCache<M, D> modelCache;
+    private final AbstractModelService<M, D> modelCache;
 
-    public AbstractTesterEndpoint(AbstractModelCache<M, D> modelCache) {
+    public AbstractTesterEndpoint(AbstractModelService<M, D> modelCache) {
         this.modelCache = modelCache;
     }
 

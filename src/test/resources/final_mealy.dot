@@ -1,0 +1,19 @@
+digraph g {
+
+	s0 [shape="circle" label="s0"];
+	s1 [shape="circle" label="s1"];
+	s2 [shape="circle" label="s2"];
+	s0 -> s1 [label="5ct? / -"];
+	s0 -> s2 [label="10ct? / -"];
+	s0 -> s0 [label="button? / -"];
+	s1 -> s2 [label="5ct? / -"];
+	s1 -> s2 [label="10ct? / 5ct!"];
+	s1 -> s1 [label="button? / -"];
+	s2 -> s2 [label="5ct? / 5ct!"];
+	s2 -> s2 [label="10ct? / 10ct!"];
+	s2 -> s0 [label="button? / coffee!"];
+
+__start0 [label="" shape="none" width="0" height="0"];
+__start0 -> s0;
+
+}

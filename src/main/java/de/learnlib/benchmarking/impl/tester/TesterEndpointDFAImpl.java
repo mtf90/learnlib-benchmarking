@@ -2,12 +2,11 @@ package de.learnlib.benchmarking.impl.tester;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 import de.learnlib.benchmarking.api.tester.TesterEndpointDFA;
 import de.learnlib.benchmarking.dto.AcceptorResponseDTO;
 import de.learnlib.benchmarking.entity.DBTesterExperiment;
-import de.learnlib.benchmarking.util.cache.ModelCacheDFA;
+import de.learnlib.benchmarking.util.cache.ModelServiceDFA;
 import de.learnlib.cli.option.Type;
 import de.learnlib.query.DefaultQuery;
 import io.avaje.http.api.Controller;
@@ -22,8 +21,8 @@ public class TesterEndpointDFAImpl extends AbstractTesterEndpoint<DFA<?, String>
 
     private final EntityManager entityManager;
 
-    public TesterEndpointDFAImpl(Context ctx, ModelCacheDFA modelCacheDFA) {
-        super(modelCacheDFA);
+    public TesterEndpointDFAImpl(Context ctx, ModelServiceDFA modelServiceDFA) {
+        super(modelServiceDFA);
         this.entityManager = ctx.attribute(EntityManager.class);
     }
 

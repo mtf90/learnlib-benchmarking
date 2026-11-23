@@ -53,6 +53,7 @@ public class Main {
                   .routing(services)
                   .routing(r -> r.before(Main::preHook))
                   .routing(r -> r.after(Main::postHook))
+                  .config(cfg -> cfg.maxRequestSize(-1))
                   .filter(new RequestLogger());
     }
 

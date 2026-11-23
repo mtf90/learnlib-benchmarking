@@ -6,7 +6,6 @@ import java.util.concurrent.ExecutionException;
 
 import de.learnlib.benchmarking.dto.AcceptorResponseDTO;
 import io.avaje.http.api.Get;
-import io.avaje.http.api.OpenAPIResponse;
 import io.avaje.http.api.Path;
 import io.avaje.http.api.Post;
 import io.avaje.http.api.Produces;
@@ -14,7 +13,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 @Path("/tester/dfa")
-public interface TesterEndpointDFA {
+public interface TesterEndpointDFA extends TesterEndpoint<AcceptorResponseDTO> {
 
     @Get("hypothesis/{id}")
     @Produces("text/vnd.graphviz")

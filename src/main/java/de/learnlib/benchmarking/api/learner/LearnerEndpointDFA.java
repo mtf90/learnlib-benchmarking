@@ -15,7 +15,7 @@ import net.automatalib.exception.FormatException;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 @Path("/learner/dfa")
-public interface LearnerEndpointDFA {
+public interface LearnerEndpointDFA extends LearnerEndpoint<List<Boolean>, AcceptorResponseDTO> {
 
     /**
      * Submit queries to be answered by the respective system under learning.

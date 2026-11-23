@@ -35,9 +35,9 @@ import net.automatalib.serialization.InputModelSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class AbstractModelCache<M extends SuffixOutput<String, D>, D> {
+public abstract class AbstractModelService<M extends SuffixOutput<String, D>, D> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractModelCache.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractModelService.class);
     protected static final Path ROOT = Path.of(System.getProperty("de.learnlib.systems.root", "systems/"));
 
     private final Map<String, InputModelData<String, M>> cache;
@@ -45,13 +45,13 @@ public abstract class AbstractModelCache<M extends SuffixOutput<String, D>, D> {
 
     public static InputModelData<String, ?> loadModel(Type type, String path) throws IOException, FormatException {
         return switch (type) {
-            case DFA -> ModelCacheDFA.readDFA(path);
-            case MEALY -> ModelCacheMealy.readMealy(path);
+            case DFA -> ModelServiceDFA.readDFA(path);
+            case MEALY -> ModelServiceMealy.readMealy(path);
             default -> throw new UnsupportedOperationException();
         };
     }
 
-    public AbstractModelCache(Path prefix, JsonType<EQOConfig> eqoSerializer) {
+    public AbstractModelService(Path prefix, JsonType<EQOConfig> eqoSerializer) {
         this.cache = new ConcurrentHashMap<>(new LRUCache<>(64));
         this.eqoSerializer = eqoSerializer;
 

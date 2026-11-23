@@ -5,6 +5,8 @@
         </encoder>
     </appender>
 
+    <logger name="de.learnlib.util.Experiment" level="WARN" />
+
     <root level="info">
         <appender-ref ref="STDOUT" />
     </root>

@@ -2,12 +2,11 @@ package de.learnlib.benchmarking.impl.tester;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 import de.learnlib.benchmarking.api.tester.TesterEndpointMealy;
 import de.learnlib.benchmarking.dto.TransducerResponseDTO;
 import de.learnlib.benchmarking.entity.DBTesterExperiment;
-import de.learnlib.benchmarking.util.cache.ModelCacheMealy;
+import de.learnlib.benchmarking.util.cache.ModelServiceMealy;
 import de.learnlib.cli.option.Type;
 import de.learnlib.query.DefaultQuery;
 import io.avaje.http.api.Controller;
@@ -24,7 +23,7 @@ public class TesterEndpointMealyImpl
 
     private final EntityManager entityManager;
 
-    public TesterEndpointMealyImpl(Context ctx, ModelCacheMealy modelCacheDFA) {
+    public TesterEndpointMealyImpl(Context ctx, ModelServiceMealy modelCacheDFA) {
         super(modelCacheDFA);
         this.entityManager = ctx.attribute(EntityManager.class);
     }

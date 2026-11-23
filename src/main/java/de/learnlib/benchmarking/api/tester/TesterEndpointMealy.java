@@ -12,7 +12,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 @Path("/tester/mealy")
-public interface TesterEndpointMealy {
+public interface TesterEndpointMealy extends TesterEndpoint<TransducerResponseDTO> {
 
     @Get("hypothesis/{id}")
     @Produces("text/vnd.graphviz")

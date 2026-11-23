@@ -5,9 +5,8 @@ import java.util.List;
 
 import de.learnlib.benchmarking.api.learner.LearnerEndpointMealy;
 import de.learnlib.benchmarking.dto.TransducerResponseDTO;
-import de.learnlib.benchmarking.entity.DBExperiment;
 import de.learnlib.benchmarking.entity.DBLearnerExperiment;
-import de.learnlib.benchmarking.util.cache.ModelCacheMealy;
+import de.learnlib.benchmarking.util.cache.ModelServiceMealy;
 import de.learnlib.cli.option.Type;
 import de.learnlib.query.DefaultQuery;
 import io.avaje.http.api.Controller;
@@ -33,7 +32,7 @@ public class LearnerEndpointMealyImpl
      * @param ctx
      *         the context
      */
-    public LearnerEndpointMealyImpl(Context ctx, ModelCacheMealy modelCache) {
+    public LearnerEndpointMealyImpl(Context ctx, ModelServiceMealy modelCache) {
         super(modelCache);
         this.entityManager = ctx.attribute(EntityManager.class);
     }
@@ -56,7 +55,7 @@ public class LearnerEndpointMealyImpl
     @Override
     protected InputModelData<String, ? extends MealyMachine<?, String, ?, String>> parseHypothesis(String hypothesis)
             throws IOException, FormatException {
-        return super.modelCache.readFromDot(hypothesis);
+        return super.modelService.readFromDot(hypothesis);
     }
 
     @Override

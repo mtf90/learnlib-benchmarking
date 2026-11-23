@@ -20,30 +20,31 @@ import io.avaje.jsonb.JsonType;
 import jakarta.inject.Singleton;
 import jakarta.persistence.EntityManagerFactory;
 import net.automatalib.alphabet.Alphabet;
-import net.automatalib.automaton.fsa.DFA;
+import net.automatalib.automaton.transducer.MealyMachine;
 import net.automatalib.exception.FormatException;
 import net.automatalib.serialization.InputModelData;
 import net.automatalib.serialization.dot.DOTParsers;
 import net.automatalib.serialization.dot.GraphDOT;
 import net.automatalib.util.automaton.Automata;
+import net.automatalib.word.Word;
 
 @Singleton
-public class ModelCacheDFA extends AbstractModelCache<DFA<?, String>, Boolean> {
+public class ModelServiceMealy extends AbstractModelService<MealyMachine<?, String, ?, String>, Word<String>> {
 
-    public ModelCacheDFA(JsonType<EQOConfig> eqoSerializer) {
-        super(Path.of("dfa"), eqoSerializer);
+    public ModelServiceMealy(JsonType<EQOConfig> eqoSerializer) {
+        super(Path.of("mealy"), eqoSerializer);
     }
 
     @Override
-    public EquivalenceOracle<DFA<?, String>, String, Boolean> getEQO(EQOConfig eqoConfig,
-                                                                     MembershipOracle<String, Boolean> mqo) {
+    public EquivalenceOracle<MealyMachine<?, String, ?, String>, String, Word<String>> getEQO(EQOConfig eqoConfig,
+                                                                                              MembershipOracle<String, Word<String>> mqo) {
         final var options = new Options();
 
         options.sul = Collections.emptyList();
         options.eqos = eqoConfig.oracles();
         options.eqoParams = eqoConfig.params();
 
-        return EQOFactory.getRegularAcceptorOracles(options, mqo, new DummySerializer<>());
+        return EQOFactory.getRegularOutputOracles(options, mqo, new DummySerializer<>());
     }
 
     @Override
@@ -55,40 +56,42 @@ public class ModelCacheDFA extends AbstractModelCache<DFA<?, String>, Boolean> {
                                readFromPath(experiment),
                                emf,
                                mqo -> getEQO(eqoConfig, mqo),
-                               LearnerFactory.getDFALearner(options));
+                               LearnerFactory.getMealyLearner(options));
     }
 
     @Override
-    public Constructor<Alphabet<String>, DFA<?, String>, String, Boolean, MembershipOracle<String, Boolean>> getLearnerConstructor(
+    public Constructor<Alphabet<String>, MealyMachine<?, String, ?, String>, String, Word<String>, MembershipOracle<String, Word<String>>> getLearnerConstructor(
             Options options) {
-        return LearnerFactory.getDFALearner(options);
+        return LearnerFactory.getMealyLearner(options);
     }
 
     @Override
-    protected boolean testEquivalence(DFA<?, String> sul, DFA<?, String> hyp, Collection<String> inputs) {
+    protected boolean testEquivalence(MealyMachine<?, String, ?, String> sul,
+                                      MealyMachine<?, String, ?, String> hyp,
+                                      Collection<String> inputs) {
         return Automata.testEquivalence(sul, hyp, inputs);
     }
 
     @Override
-    protected void writeHypothesis(DFA<?, String> hypothesis, Collection<String> alphabet, Writer w)
+    protected void writeHypothesis(MealyMachine<?, String, ?, String> hypothesis, Collection<String> alphabet, Writer w)
             throws IOException {
         GraphDOT.write(hypothesis, alphabet, w);
     }
 
     @Override
-    public InputModelData<String, ? extends DFA<?, String>> readFromDot(String dot)
+    public InputModelData<String, ? extends MealyMachine<?, String, ?, String>> readFromDot(String dot)
             throws IOException, FormatException {
-        return DOTParsers.dfa().readModel(dot.getBytes(StandardCharsets.UTF_8));
+        return DOTParsers.mealy().readModel(dot.getBytes(StandardCharsets.UTF_8));
     }
 
     @Override
-    public InputModelData<String, ? extends DFA<?, String>> readFromPath(String path)
+    public InputModelData<String, ? extends MealyMachine<?, String, ?, String>> readFromPath(String path)
             throws IOException, FormatException {
-        return readDFA(path);
+        return readMealy(path);
     }
 
-    public static InputModelData<String, ? extends DFA<?, String>> readDFA(String path)
+    public static InputModelData<String, ? extends MealyMachine<?, String, ?, String>> readMealy(String path)
             throws IOException, FormatException {
-        return DOTParsers.dfa().readModel(ROOT.resolve(path).toFile());
+        return DOTParsers.mealy().readModel(ROOT.resolve(path).toFile());
     }
 }

@@ -8,9 +8,8 @@ import de.learnlib.benchmarking.dto.EQOConfig;
 import de.learnlib.benchmarking.entity.DBExperiment;
 import de.learnlib.benchmarking.entity.DBRunnerExperiment;
 import de.learnlib.benchmarking.entity.DBTesterExperiment;
-import de.learnlib.benchmarking.util.cache.ModelCacheDFA;
-import de.learnlib.benchmarking.util.cache.ModelCacheMealy;
-import de.learnlib.cli.factory.LearnerFactory;
+import de.learnlib.benchmarking.util.cache.ModelServiceDFA;
+import de.learnlib.benchmarking.util.cache.ModelServiceMealy;
 import de.learnlib.cli.option.Learner;
 import de.learnlib.cli.option.Options;
 import de.learnlib.cli.option.Type;
@@ -27,26 +26,26 @@ public class RunnerManager {
     private static final ExecutorService EXECUTOR_SERVICE =
             Executors.newFixedThreadPool(Math.ceilDiv(Runtime.getRuntime().availableProcessors(), 2));
 
-    private final ModelCacheDFA modelCacheDFA;
-    private final ModelCacheMealy modelCacheMealy;
+    private final ModelServiceDFA modelServiceDFA;
+    private final ModelServiceMealy modelServiceMealy;
 
-    public RunnerManager(ModelCacheDFA modelCacheDFA, ModelCacheMealy modelCacheMealy) {
-        this.modelCacheDFA = modelCacheDFA;
-        this.modelCacheMealy = modelCacheMealy;
+    public RunnerManager(ModelServiceDFA modelServiceDFA, ModelServiceMealy modelServiceMealy) {
+        this.modelServiceDFA = modelServiceDFA;
+        this.modelServiceMealy = modelServiceMealy;
     }
 
     public boolean testEquivalence(DBExperiment experiment, String hypothesis) throws IOException, FormatException {
         return switch (experiment.getType()) {
-            case DFA -> modelCacheDFA.checkEquivalenceWithHypothesis(experiment, hypothesis);
-            case MEALY -> modelCacheMealy.checkEquivalenceWithHypothesis(experiment, hypothesis);
+            case DFA -> modelServiceDFA.checkEquivalenceWithHypothesis(experiment, hypothesis);
+            case MEALY -> modelServiceMealy.checkEquivalenceWithHypothesis(experiment, hypothesis);
             default -> throw new IllegalArgumentException();
         };
     }
 
     public void startLearningProcessSync(DBTesterExperiment experiment) {
         switch (experiment.getType()) {
-            case DFA -> modelCacheDFA.startLearner(experiment);
-            case MEALY -> modelCacheMealy.startLearner(experiment);
+            case DFA -> modelServiceDFA.startLearner(experiment);
+            case MEALY -> modelServiceMealy.startLearner(experiment);
             default -> throw new IllegalStateException();
         }
     }
@@ -58,10 +57,11 @@ public class RunnerManager {
                                   EQOConfig eqoConfig) {
         final var options = new Options();
         options.learner = learner;
+        options.type = type;
 
         var runnable = switch (type) {
-            case DFA -> modelCacheDFA.createExperimentRunner(emf, experiment, eqoConfig, options);
-            case MEALY -> modelCacheMealy.createExperimentRunner(emf, experiment, eqoConfig, options);
+            case DFA -> modelServiceDFA.createExperimentRunner(emf, experiment, eqoConfig, options);
+            case MEALY -> modelServiceMealy.createExperimentRunner(emf, experiment, eqoConfig, options);
             default -> throw new IllegalStateException();
         };
 
