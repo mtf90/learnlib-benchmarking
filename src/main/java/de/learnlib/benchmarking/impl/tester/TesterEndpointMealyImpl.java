@@ -3,7 +3,7 @@ package de.learnlib.benchmarking.impl.tester;
 import java.io.IOException;
 import java.util.List;
 
-import de.learnlib.benchmarking.api.tester.TesterEndpointMealy;
+import de.learnlib.benchmarking.api.TesterEndpointMealy;
 import de.learnlib.benchmarking.dto.TransducerResponseDTO;
 import de.learnlib.benchmarking.entity.DBTesterExperiment;
 import de.learnlib.benchmarking.util.cache.ModelServiceMealy;

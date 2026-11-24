@@ -12,7 +12,7 @@ import de.learnlib.benchmarking.ServerLifecycleListener;
 import de.learnlib.benchmarking.Util;
 import de.learnlib.benchmarking.api.ExperimentEndpoint;
 import de.learnlib.benchmarking.api.StatisticsEndpoint;
-import de.learnlib.benchmarking.api.learner.LearnerEndpoint;
+import de.learnlib.benchmarking.api.LearnerEndpoint;
 import de.learnlib.benchmarking.dto.AcceptorResponseDTO;
 import de.learnlib.benchmarking.dto.EQOConfig;
 import de.learnlib.benchmarking.dto.NewExperimentInputDTO;

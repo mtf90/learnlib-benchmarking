@@ -24,6 +24,7 @@
         <avaje-jsonb.version>3.16</avaje-jsonb.version>
         <checkerframework.version>4.2.1</checkerframework.version>
         <eclipselink.version>5.0.2</eclipselink.version>
+        <groovy.version>6.0.0</groovy.version>
         <hsqldb.version>2.7.4</hsqldb.version>
         <learnlib.version>20.0.0-SNAPSHOT</learnlib.version>
         <logback.version>1.5.35</logback.version>
@@ -31,6 +32,7 @@
         <metainf-services.version>1.11</metainf-services.version>
 
         <compiler-plugin.version>3.15.0</compiler-plugin.version>
+        <gmavenplus-plugin.version>4.3.1</gmavenplus-plugin.version>
         <jlink-plugin.version>3.3.0</jlink-plugin.version>
     </properties>
 
@@ -185,6 +187,62 @@
     <build>
         <plugins>
             <plugin>
+                <groupId>org.codehaus.gmavenplus</groupId>
+                <artifactId>gmavenplus-plugin</artifactId>
+                <version>${gmavenplus-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>generate-controllers</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>execute</goal>
+                        </goals>
+                        <configuration>
+                            <scripts>
+                                <script>${project.basedir}/src/build/groovy/GenerateLearnerControllers.groovy</script>
+                                <script>${project.basedir}/src/build/groovy/GenerateTesterControllers.groovy</script>
+                            </scripts>
+                        </configuration>
+                    </execution>
+                </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.apache.groovy</groupId>
+                        <artifactId>groovy</artifactId>
+                        <version>${groovy.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.apache.groovy</groupId>
+                        <artifactId>groovy-ant</artifactId>
+                        <version>${groovy.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.apache.maven</groupId>
+                        <artifactId>maven-core</artifactId>
+                        <version>3.10.2</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>3.8.0</version>
+                <executions>
+                    <execution>
+                        <id>add-generated-sources</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>${project.build.directory}/generated-sources/controllers</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>${compiler-plugin.version}</version>
@@ -254,7 +312,8 @@
                     <enableAssertions>true</enableAssertions>
                     <systemPropertyVariables>
                         <!-- run test DB in-memory -->
-                        <jakarta.persistence.jdbc.url>jdbc:hsqldb:mem:benchmarking;shutdown=true</jakarta.persistence.jdbc.url>
+                        <jakarta.persistence.jdbc.url>jdbc:hsqldb:mem:benchmarking;shutdown=true
+                        </jakarta.persistence.jdbc.url>
                     </systemPropertyVariables>
                 </configuration>
                 <executions>

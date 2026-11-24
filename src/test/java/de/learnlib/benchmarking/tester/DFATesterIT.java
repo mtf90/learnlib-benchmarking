@@ -7,9 +7,9 @@ import java.util.List;
 import java.util.Set;
 
 import de.learnlib.benchmarking.ServerLifecycleListener;
-import de.learnlib.benchmarking.api.tester.TesterEndpoint;
-import de.learnlib.benchmarking.api.tester.TesterEndpointDFA;
-import de.learnlib.benchmarking.api.tester.TesterEndpointMealy;
+import de.learnlib.benchmarking.api.TesterEndpoint;
+import de.learnlib.benchmarking.api.TesterEndpointDFA;
+import de.learnlib.benchmarking.api.TesterEndpointMealy;
 import de.learnlib.benchmarking.dto.AcceptorResponseDTO;
 import de.learnlib.cli.option.Type;
 import org.testng.Assert;

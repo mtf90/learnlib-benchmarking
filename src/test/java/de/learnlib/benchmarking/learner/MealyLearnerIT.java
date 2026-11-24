@@ -8,9 +8,9 @@ import java.util.Set;
 
 import de.learnlib.benchmarking.ServerLifecycleListener;
 import de.learnlib.benchmarking.Util;
-import de.learnlib.benchmarking.api.learner.LearnerEndpoint;
-import de.learnlib.benchmarking.api.learner.LearnerEndpointDFA;
-import de.learnlib.benchmarking.api.learner.LearnerEndpointMealy;
+import de.learnlib.benchmarking.api.LearnerEndpoint;
+import de.learnlib.benchmarking.api.LearnerEndpointDFA;
+import de.learnlib.benchmarking.api.LearnerEndpointMealy;
 import de.learnlib.benchmarking.dto.NewExperimentOutputDTO;
 import de.learnlib.benchmarking.dto.TransducerResponseDTO;
 import de.learnlib.benchmarking.util.cache.ModelServiceMealy;

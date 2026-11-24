@@ -13,7 +13,7 @@ import de.learnlib.benchmarking.Util;
 import de.learnlib.benchmarking.api.EquivalenceEndpoint;
 import de.learnlib.benchmarking.api.ExperimentEndpoint;
 import de.learnlib.benchmarking.api.StatisticsEndpoint;
-import de.learnlib.benchmarking.api.tester.TesterEndpoint;
+import de.learnlib.benchmarking.api.TesterEndpoint;
 import de.learnlib.benchmarking.dto.EQOConfig;
 import de.learnlib.benchmarking.dto.NewExperimentInputDTO;
 import de.learnlib.benchmarking.dto.NewExperimentOutputDTO;
