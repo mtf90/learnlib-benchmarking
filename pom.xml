@@ -111,12 +111,6 @@
             <version>${avaje-jsonb.version}</version>
         </dependency>
 
-        <dependency>
-            <groupId>io.swagger.core.v3</groupId>
-            <artifactId>swagger-annotations</artifactId>
-            <version>3.0.0</version>
-        </dependency>
-
         <!-- all persistence stuff -->
         <dependency>
             <groupId>org.eclipse.persistence</groupId>
@@ -142,6 +136,13 @@
             <groupId>org.checkerframework</groupId>
             <artifactId>checker-qual</artifactId>
             <version>${checkerframework.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>io.swagger.core.v3</groupId>
+            <artifactId>swagger-annotations</artifactId>
+            <version>3.0.0</version>
             <scope>provided</scope>
         </dependency>
 

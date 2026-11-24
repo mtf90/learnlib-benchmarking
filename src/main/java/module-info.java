@@ -38,8 +38,7 @@ open module de.learnlib.benchmarking {
 
     requires org.slf4j;
 
-    requires io.swagger.v3.oas.annotations;
-
+    requires static io.swagger.v3.oas.annotations;
     requires static lombok;
     requires static org.checkerframework.checker.qual;
 
