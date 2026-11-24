@@ -21,7 +21,7 @@
         <avaje-http.version>3.13-RC3</avaje-http.version>
         <avaje-inject.version>12.7</avaje-inject.version>
         <avaje-jex.version>3.6</avaje-jex.version>
-        <avaje-jsonb.version>3.16</avaje-jsonb.version>
+        <avaje-jsonb.version>3.17-RC5</avaje-jsonb.version>
         <checkerframework.version>4.2.1</checkerframework.version>
         <eclipselink.version>5.0.2</eclipselink.version>
         <groovy.version>6.0.0</groovy.version>

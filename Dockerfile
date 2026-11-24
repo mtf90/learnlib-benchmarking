@@ -49,10 +49,12 @@
 FROM gcr.io/distroless/java-base-debian13:nonroot
 
 WORKDIR /app
-
 COPY target/maven-jlink/default .
+
+WORKDIR /home/nonroot
 COPY systems systems
-ENTRYPOINT ["./bin/java", "-m", "de.learnlib.benchmarking/de.learnlib.benchmarking.Main"]
+
+ENTRYPOINT ["/app/bin/java", "-m", "de.learnlib.benchmarking/de.learnlib.benchmarking.Main"]
 
 ## build (from the project root) via
 # docker build -f benchmarking/Dockerfile -t learnlib-benchmarking .

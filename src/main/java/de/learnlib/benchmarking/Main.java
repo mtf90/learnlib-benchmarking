@@ -1,8 +1,5 @@
 package de.learnlib.benchmarking;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.List;
 
 import de.learnlib.benchmarking.util.RequestLogger;
@@ -29,11 +26,7 @@ public class Main {
     private static final EntityManagerFactory EMF =
             Persistence.createEntityManagerFactory("pu", System.getProperties());
 
-    static void main() throws IOException {
-        var dbDirectory = Path.of("data");
-        if (!Files.exists(dbDirectory)) {
-            Files.createDirectory(dbDirectory);
-        }
+    static void main() {
         final var jex = buildJex();
         jex.start();
     }
